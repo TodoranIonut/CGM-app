@@ -75,7 +75,7 @@ function Molecule(props) {
   };
 
   const path = useComputedValue(() => {
-    animation();
+    // animation();
     return spline(points.current, 1, true);
   }, [clock]);
 
@@ -94,8 +94,9 @@ function Molecule(props) {
       <Path path={path}>
         <LinearGradient
           start={vec(100, 100)}
-          end={endGradientCoordinate}
-          colors={[colors.purple, colors.orange]}
+          // end={endGradientCoordinate}
+          end={vec(200, 200)}
+          colors={[colors.absoluteBlack, colors.absoluteWhite]}
         />
       </Path>
     </Canvas>

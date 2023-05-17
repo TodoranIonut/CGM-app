@@ -1,19 +1,12 @@
-import {
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-  StatusBar,
-  Dimensions,
-  TextInput,
-  Pressable,
-} from "react-native";
-
 import styles from "./styles";
 import React, { useState } from "react";
-import LoginScreen from "./app/screen/LoginScreen";
+import { AuthContext, AuthProvider } from "./app/context/AuthContext";
+import { AppNav } from "./app/navigation/AppNav";
 
 export default function App() {
-  return <LoginScreen></LoginScreen>;
+  return (
+    <AuthProvider>
+      <AppNav />
+    </AuthProvider>
+  );
 }
