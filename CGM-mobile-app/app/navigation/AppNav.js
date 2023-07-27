@@ -16,6 +16,7 @@ import DeviceScreen from "../screen/DeviceScreen";
 import ProfileScreen from "../screen/ProfileScreen";
 import PacientsScreen from "../screen/PacientsScreen";
 import SettingsScreen from "../screen/SettingsScreen";
+import colors from "../config/colors";
 
 //screen names
 const homeName = "Home";
@@ -53,7 +54,7 @@ const BottomTabNavigator = () => (
 
         return <Ionicons name={iconName} size={size} color={color} />;
       },
-      tabBarActiveTintColor: "tomato",
+      tabBarActiveTintColor: colors.mintGreenDark,
       tabBarInactiveTintColor: "grey",
       tabBarLabelStyle: { paddingBottom: 10, fontSize: 13 },
       tabBarIconStyle: { paddingTop: -5, height: 25 },

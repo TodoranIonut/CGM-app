@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Text,
   View,
-  StatusBar,
   Dimensions,
   TextInput,
   Pressable,
@@ -62,7 +61,7 @@ function LoginScreen(props) {
       </Animated.View>
       <View style={styles.bottomContainer}>
         <TextInput
-          placeholder="Email "
+          placeholder="Email"
           placeholderTextColor="white"
           value={email}
           onChangeText={(email) => setEmail(email)}

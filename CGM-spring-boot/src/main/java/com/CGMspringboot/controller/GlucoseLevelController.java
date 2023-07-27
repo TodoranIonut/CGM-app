@@ -12,8 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,18 +42,29 @@ public class GlucoseLevelController {
 
     @GetMapping("/byDate/patient/id/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
-    public ResponseEntity<List<GlucoseLevelResponseDTO>> getDailyGlucoseLevel(@PathVariable Integer id, @RequestParam String dateFormat, @RequestParam  String date) throws CGMApplicationException {
+    public ResponseEntity<List<GlucoseLevelResponseDTO>> getDailyGlucoseLevel(@PathVariable Integer id, @RequestParam String dateFormat, @RequestParam String date) throws CGMApplicationException {
         SimpleDateFormat simpleDateFormat = null;
         Date formatedDate = null;
-        try{
+        try {
             simpleDateFormat = new SimpleDateFormat(dateFormat);
             formatedDate = simpleDateFormat.parse(date);
-        } catch (IllegalArgumentException | ParseException e){
-           throw new InvalidDateFormatException();
+        } catch (IllegalArgumentException | ParseException e) {
+            throw new InvalidDateFormatException();
         }
-        List<GlucoseLevel> dalyGlucoseLevel = glucoseLevelService.getGlucoseLevelByDate(formatedDate,id);
+        List<GlucoseLevel> dalyGlucoseLevel = glucoseLevelService.getGlucoseLevelByDate(formatedDate, id);
         List<GlucoseLevelResponseDTO> responseList = glucoseLevelMapper.toGlucoseLevelResponseDTOList(dalyGlucoseLevel);
         return ResponseEntity.ok().body(responseList);
+    }
+
+    @GetMapping("/upload")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+//    public ResponseEntity<String> saveGlucoseFileData(@RequestParam("file")MultipartFile file) throws IOException {
+    public ResponseEntity<String> saveGlucoseFileData() throws IOException {
+        RestTemplate restTemplate = new RestTemplate();
+        String fooResourceUrl
+                = "http://localhost:8000";
+        ResponseEntity<String> response = restTemplate.getForEntity(fooResourceUrl, String.class);
+        return response;
     }
 
 }

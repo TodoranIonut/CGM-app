@@ -77,4 +77,23 @@ const profileStyles = StyleSheet.create({
     paddingLeft: "5%",
     fontWeight: "500",
   },
+  button: {
+    backgroundColor: colors.grey,
+    height: 55,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 25,
+    marginTop: 30,
+    borderRadius: 35,
+    borderWidth: 1.5,
+    borderColor: colors.absoluteWhite,
+    shadowColor: colors.absoluteWhite,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
 });

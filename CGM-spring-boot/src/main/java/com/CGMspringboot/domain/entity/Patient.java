@@ -21,9 +21,17 @@ public class Patient extends AppUser {
     private float heightCm;
     private float weightKg;
 
+    @Enumerated(EnumType.STRING)
+    private Diagnostic diagnostic;
+
     public enum Gender {
         MALE, FEMALE
     }
+
+    public enum Diagnostic {
+        HEALTHY, DIABETES_I, DIABETES_II
+    }
+
 
     @ManyToOne
     @JoinColumn(name = "doctor_id")
