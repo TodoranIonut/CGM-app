@@ -1,38 +1,40 @@
 import csv
 import math
 import os
-
+import shutil
 import numpy as np
 import pandas as pd
 
-from constants import PACIENT_DATA_FILE_SUFIX, PACIENT_MODEL_FILE_SUFIX, PACIENT_FILE_PREFIX, \
-    PACIENT_DIRECTORY_PATH_PREFIX
-
+from utils.constants import PATIENT_DATA_FILE_SUFIX,PATIENT_MODEL_FILE_SUFIX,\
+    PATIENT_FILE_PREFIX,PATIENT_DIRECTORY_PATH_PREFIX,PATIENT_NEW_DATA_FILE_SUFIX
 
 def get_data_full_path(pacientId):
     pathDir = get_patient_directory_path(pacientId)
     dataFile = get_patient_data_file_name(pacientId)
     return os.path.join(pathDir, dataFile)
 
-
 def get_model_full_path(pacientId):
     pathDir = get_patient_directory_path(pacientId)
     modelFile = get_patient_model_file_name(pacientId)
     return os.path.join(pathDir, modelFile)
 
+def get_new_data_full_path(pacientId):
+    pathDir = get_patient_directory_path(pacientId)
+    dataFile = get_patient_new_data_file_name(pacientId)
+    return os.path.join(pathDir, dataFile)
 
 def get_patient_directory_path(pacientId):
     crtDir = os.getcwd()
-    return os.path.join(crtDir, PACIENT_DIRECTORY_PATH_PREFIX + pacientId)
-
+    return os.path.join(crtDir, PATIENT_DIRECTORY_PATH_PREFIX + pacientId)
 
 def get_patient_data_file_name(pacientId):
-    return PACIENT_FILE_PREFIX + pacientId + PACIENT_DATA_FILE_SUFIX
+    return PATIENT_FILE_PREFIX + pacientId + PATIENT_DATA_FILE_SUFIX
 
+def get_patient_new_data_file_name(pacientId):
+    return PATIENT_FILE_PREFIX + pacientId + PATIENT_NEW_DATA_FILE_SUFIX
 
 def get_patient_model_file_name(pacientId):
-    return PACIENT_FILE_PREFIX + pacientId + PACIENT_MODEL_FILE_SUFIX
-
+    return PATIENT_FILE_PREFIX + pacientId + PATIENT_MODEL_FILE_SUFIX
 
 def load_data_from_file(path, fileName, featureName):
     crtDir = os.getcwd()
@@ -50,8 +52,7 @@ def load_data_from_file(path, fileName, featureName):
     # return np.array(input)
     return input
 
-
-def create_pacient_csv_file(filePath):
+def create_patient_csv_file(filePath):
     # crtDir = os.getcwd()
     # directoryPath = os.path.join(crtDir, directory)
     #
@@ -67,19 +68,19 @@ def create_pacient_csv_file(filePath):
         df = pd.DataFrame(columns=headers)
         df.to_csv(filePath, index=False)
 
+def append_data_patient_csv_file(file_path, file_data):
 
-def append_data_pacient_csv_file(file_path, file_data):
     with open(file_path, 'a', newline='') as file:
         writer = csv.writer(file)
-
-        # Append each row to the CSV file
         writer.writerow(file_data)
-        # option with append line
-        # for row in file_data:
-        #     writer.writerow(row)
 
+def append_data_patient_csv_file_from_zero(file_path, file_data):
+    existing_df = pd.read_csv(file_path)
+    block_df = pd.DataFrame(file_data)
+    result_df = pd.concat([existing_df, block_df], ignore_index=True)
+    result_df.to_csv(file_path, index=False)
 
-def append_linear_data_to_pacient_csv_file(file_path, file_data):
+def append_linear_data_to_patient_csv_file(file_path, file_data):
     # Read the existing CSV file
 
     with open(file_path, 'r') as file:
@@ -97,15 +98,15 @@ def append_linear_data_to_pacient_csv_file(file_path, file_data):
         last_timestamp = int(rows[last_row_index][0])
         last_glicemia_value = float(rows[last_row_index][1])
 
-        to_timesteamp = file_data[0][0]
+        to_timestamp = file_data[0][0]
         to_glicemia_value = file_data[0][1]
 
         timestamp_5_minutes = 300
-        number_of_generated_values = int((to_timesteamp - last_timestamp) / timestamp_5_minutes)
+        number_of_generated_values = int((to_timestamp - last_timestamp) / timestamp_5_minutes)
 
         print(number_of_generated_values)
 
-        new_timestamp_values = np.round(np.linspace(last_timestamp, to_timesteamp, number_of_generated_values + 1),
+        new_timestamp_values = np.round(np.linspace(last_timestamp, to_timestamp, number_of_generated_values + 1),
                                         decimals=0)
 
         new_glicemia_values = np.round(
@@ -194,4 +195,10 @@ def read_clean_fill_invalid_data(filePath):
                 find_start = False
                 find_finish = False
     dataset.to_csv(filePath, index=False)
+
     return pd.read_csv(filePath)
+
+
+
+def copy_file(fileSource, fileDestination):
+    shutil.copy(fileSource, fileDestination)

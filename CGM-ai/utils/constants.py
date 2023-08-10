@@ -1,6 +1,7 @@
-PACIENT_DIRECTORY_PATH_PREFIX = "data\pacients\case_id_"
+PATIENT_DIRECTORY_PATH_PREFIX = "data\pacients\case_id_"
 
-PACIENT_FILE_PREFIX = "case_id_"
+PATIENT_FILE_PREFIX = "case_id_"
 
-PACIENT_DATA_FILE_SUFIX = "_data.csv"
-PACIENT_MODEL_FILE_SUFIX = "_model.h5"
+PATIENT_DATA_FILE_SUFIX = "_data.csv"
+PATIENT_NEW_DATA_FILE_SUFIX = "_new_data.csv"
+PATIENT_MODEL_FILE_SUFIX = "_model.h5"
