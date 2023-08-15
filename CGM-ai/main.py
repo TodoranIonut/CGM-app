@@ -2,9 +2,11 @@ from fastapi import FastAPI
 from dao.NewMeasureDAO import NewMeasureDAO
 from utils.fileUtils import get_model_full_path, read_clean_fill_invalid_data, get_data_full_path, \
     create_patient_csv_file, append_linear_data_to_patient_csv_file, create_directory_if_not_exist, \
-    append_data_patient_csv_file, delete_oldest_data, get_patient_new_data_file_name, get_new_data_full_path, copy_file
+    delete_oldest_data, get_patient_new_data_file_name, get_new_data_full_path, copy_file,\
+    append_data_one_row_patient_csv_file,is_path_valid
 from utils.modelDataUtils import splitData
 from service.LSTMService import train_network_model,estimate_using_model
+from service.patientService import add_glucose_measure_to_patient_file,train_model,predict_glucose_level
 from keras.models import Sequential, load_model
 from keras.layers import Dense, LSTM, Dropout, GRU, Bidirectional
 import os
@@ -14,7 +16,6 @@ import pandas as pd
 import torch
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
-
 app = FastAPI()
 
 
@@ -40,7 +41,7 @@ def add_new_measure(newMeasure: NewMeasureDAO):
 
     fileData = [newMeasure.timestamp, newMeasure.glucoseMgPerDl]
 
-    append_data_patient_csv_file(filePath, fileData)
+    append_data_one_row_patient_csv_file(filePath, fileData)
     return fileData
 
 
@@ -71,6 +72,7 @@ def delete_old_measurements(pacientId: str):
 @app.post("/api/train/{patientId}")
 def start_train_patient_model(patientId: str):
     filePath = get_data_full_path(patientId)
+
     saveModelFilePath = get_model_full_path(patientId)
     dataset = read_clean_fill_invalid_data(filePath)
 
@@ -85,11 +87,70 @@ def start_train_patient_model(patientId: str):
     trainData = dataset['glicemia'].values
     trainData = trainData.reshape(-1, 1)
 
-    # train_network_model(trainData, saveModelFilePath)
+    train_network_model(trainData, saveModelFilePath)
     return times
 
+@app.post("/api/retrain/{patientId}")
+def start_train_patient_model(patientId: str):
+
+    filePath = get_new_data_full_path(patientId)
+
+    if not is_path_valid(filePath):
+        copy_file(get_data_full_path(patientId),filePath)
+
+    saveModelFilePath = get_model_full_path(patientId)
+    dataset = read_clean_fill_invalid_data(filePath)
+
+    dt = dataset['timestamp'].values
+    times = [datetime.datetime.fromtimestamp(t) for t in dt]
+
+    # trainInputs, testInputs = splitData(dataset)
+    print("total=", len(dataset))
+    trainData = dataset['glicemia'].values
+    trainData = trainData.reshape(-1, 1)
+
+    train_network_model(trainData, saveModelFilePath)
+    return times
 
 @app.get("/api/estimate/{patientId}")
 def estimate_high_glicemia(patientId: str):
     estimate_using_model(patientId)
     return patientId
+
+@app.get("/api/multiple/{patientId}")
+def estimate_high_glicemia(patientId: str):
+
+    filePath = get_new_data_full_path(patientId)
+
+    if not is_path_valid(filePath):
+        copy_file(get_data_full_path(patientId),filePath)
+
+    saveModelFilePath = get_model_full_path(patientId)
+    dataset = read_clean_fill_invalid_data(filePath)
+    lastDateTime = dataset['timestamp'].values[-1]
+    lastDateString = datetime.datetime.fromtimestamp(int(lastDateTime))
+
+#remove
+    compareDate = datetime.datetime(2023, 6, 20, 15, 45, 15)
+
+    while compareDate > lastDateString:
+        print(lastDateString)
+        # dt = dataset['timestamp'].values
+        # times = [datetime.datetime.fromtimestamp(t) for t in dt]
+
+        # trainInputs, testInputs = splitData(dataset)
+        print("total=", len(dataset))
+        trainData = dataset['glicemia'].values
+        trainData = trainData.reshape(-1, 1)
+
+        train_network_model(trainData, saveModelFilePath)
+        estimate_using_model(patientId)
+
+        delete_oldest_data(filePath,300)
+        dataset = read_clean_fill_invalid_data(filePath)
+        lastDateTime = dataset['timestamp'].values[-1]
+        lastDateString = datetime.datetime.fromtimestamp(lastDateTime)
+
+
+    return lastDateString
+    # return "DA"

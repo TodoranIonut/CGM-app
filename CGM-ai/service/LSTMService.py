@@ -1,17 +1,13 @@
 from utils.fileUtils import get_model_full_path, read_clean_fill_invalid_data, get_data_full_path, \
     create_patient_csv_file, append_linear_data_to_patient_csv_file, create_directory_if_not_exist, \
-    append_data_patient_csv_file, delete_oldest_data, get_new_data_full_path, append_data_patient_csv_file_from_zero
-import pandas as pd
-import numpy as np
+     delete_oldest_data, get_new_data_full_path, append_data_patient_csv_file_from_zero, \
+    is_path_valid,copy_file
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential, load_model
 from keras.layers import Dense, LSTM, Dropout, GRU, Bidirectional
-import os
 import numpy as np
 import datetime
 import pandas as pd
-import torch
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 
 def train_network_model(trainData, savingFile):
@@ -42,9 +38,9 @@ def train_network_model(trainData, savingFile):
     # First LSTM layer with Dropout regularisation
     regressor.add(Bidirectional(LSTM(units=50, return_sequences=True, input_shape=(X_train.shape[1], 1))))
     regressor.add(Dropout(0.2))
-    # Second LSTM layer
-    regressor.add(Bidirectional(LSTM(units=50, return_sequences=True)))
-    regressor.add(Dropout(0.2))
+    # # Second LSTM layer
+    # regressor.add(Bidirectional(LSTM(units=50, return_sequences=True)))
+    # regressor.add(Dropout(0.2))
     # Third LSTM layer
     regressor.add(Bidirectional(LSTM(units=50, return_sequences=True)))
     regressor.add(Dropout(0.2))
@@ -57,7 +53,7 @@ def train_network_model(trainData, savingFile):
     # Compiling the RNN
     regressor.compile(optimizer='rmsprop', loss='mean_squared_error')
     # Fitting to the training set
-    regressor.fit(X_train, y_train, epochs=40, batch_size=32)
+    regressor.fit(X_train, y_train, epochs=3, batch_size=32)
 
     regressor.save(savingFile,overwrite=True,include_optimizer=True)
 
@@ -67,10 +63,14 @@ def train_network_model(trainData, savingFile):
 def estimate_using_model(patientId):
 
     filePath = get_new_data_full_path(patientId)
+
+    if not is_path_valid(filePath):
+        copy_file(get_data_full_path(patientId),filePath)
+
     modelFilePath = get_model_full_path(patientId)
     dataset = read_clean_fill_invalid_data(filePath)
-    dt = dataset['timestamp'].values
-    times = [datetime.datetime.fromtimestamp(t) for t in dt]
+    # dt = dataset['timestamp'].values
+    # times = [datetime.datetime.fromtimestamp(t) for t in dt]
 
     trainData = dataset['glicemia'].values
     trainData = trainData.reshape(-1, 1)
@@ -112,17 +112,18 @@ def estimate_using_model(patientId):
     df_forecast = pd.DataFrame(
         {'timestamp': pd.to_datetime(forecast_dates).astype('int64') // 10 ** 9,
          # 'Date': np.array(forecast_dates),
-         'glicemia': y_pred_future})
+         'glicemia': y_pred_future.astype(int)})
 
     original = dataset[['timestamp', 'glicemia']]
 
     # org = dataset['timestamp'].values
     # original['Date'] = [datetime.datetime.fromtimestamp(t) for t in org]
 
-    newDataset = pd.concat([original, df_forecast], ignore_index=True)
+    # newDataset = pd.concat([original, df_forecast], ignore_index=True)
 
     patientNewDataFile = get_new_data_full_path(patientId)
-    create_patient_csv_file(patientNewDataFile)
-    # append_data_patient_csv_file(patientNewDataFile,newDataset)
-    append_data_patient_csv_file_from_zero(patientNewDataFile, newDataset)
-    print(newDataset[-3:])
+    # create_patient_csv_file(patientNewDataFile)
+    append_data_patient_csv_file_from_zero(patientNewDataFile, df_forecast)
+
+    print(df_forecast[-3:])
+    return pd.concat([original, df_forecast], ignore_index=True)

@@ -68,7 +68,7 @@ def create_patient_csv_file(filePath):
         df = pd.DataFrame(columns=headers)
         df.to_csv(filePath, index=False)
 
-def append_data_patient_csv_file(file_path, file_data):
+def append_data_one_row_patient_csv_file(file_path, file_data):
 
     with open(file_path, 'a', newline='') as file:
         writer = csv.writer(file)
@@ -199,6 +199,8 @@ def read_clean_fill_invalid_data(filePath):
     return pd.read_csv(filePath)
 
 
+def is_path_valid(path):
+    return os.path.isfile(path) or os.path.exists(path)
 
 def copy_file(fileSource, fileDestination):
     shutil.copy(fileSource, fileDestination)
