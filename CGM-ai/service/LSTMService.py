@@ -55,7 +55,9 @@ def train_network_model(trainData, savingFile):
     # Fitting to the training set
     regressor.fit(X_train, y_train, epochs=3, batch_size=32)
 
-    regressor.save(savingFile,overwrite=True,include_optimizer=True)
+    if len(savingFile) > 0:
+        regressor.save(savingFile,overwrite=True,include_optimizer=True)
+    # regressor.save(savingFile,overwrite=True,include_optimizer=True)
 
     return regressor,sc,X_train,y_train
 
