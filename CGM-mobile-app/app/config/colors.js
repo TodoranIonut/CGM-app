@@ -7,9 +7,13 @@ export default {
   lightPeach: "rgba(255, 231, 227, 1)",
   lightPurple: "rgba(236, 188, 255, 0.3)",
   grey: "rgba(33, 32, 32, 1)",
+  greyLight: "rgba(53, 72, 72, 1)",
   absoluteBlack: "rgba(0, 0, 0, 1)",
   absoluteWhite: "rgba(255, 255, 255, 1)",
   mintGreenDark: "rgba(62,180,137, 1)",
   mintGreenLight: "rgba(152, 255, 152, 1)",
+  greenWhite: "rgba(225, 255, 237, 1)",
   pinkLight: "rgba(255, 152, 255, 1)",
+  redStatus: "rgba(214, 29, 29, 1)",
+  yellowStatus: "rgba(204, 152, 34, 0.89)",
 };

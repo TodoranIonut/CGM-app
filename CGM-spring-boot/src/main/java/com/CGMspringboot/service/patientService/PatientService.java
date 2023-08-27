@@ -21,9 +21,13 @@ public interface PatientService {
 
     List<Patient> findPatientsByDoctor(Integer doctorId);
 
+    List<Patient> findPatientsByDoctorEmail(String email) throws UserEmailNotFoundException;
+
     void deletePatientById(Integer patientId);
 
     void checkPatientPhoneNumberIsAvailable(String phoneNumber) throws UserPhoneNumberConflictException;
 
     void checkPatientEmailIsAvailable(String email) throws UserEmailConflictException;
+
+
 }

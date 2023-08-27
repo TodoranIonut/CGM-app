@@ -24,14 +24,14 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/glucose")
+@RequestMapping("/api/glucose")
 public class GlucoseLevelController {
 
     private final GlucoseLevelService glucoseLevelService;
     private final GlucoseLevelMapper glucoseLevelMapper;
 
     @PostMapping("/save")
-    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
     public ResponseEntity<GlucoseLevelResponseDTO> saveGlucoseLevel(@RequestBody GlucoseLevelRequestDTO glucoseLevelRequestDTO) throws UserIdNotFoundException {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/glucose/save").toUriString());
         GlucoseLevel glucoseLevel = glucoseLevelMapper.toGlucoseLevel(glucoseLevelRequestDTO);
@@ -41,7 +41,7 @@ public class GlucoseLevelController {
     }
 
     @GetMapping("/byDate/patient/id/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
     public ResponseEntity<List<GlucoseLevelResponseDTO>> getDailyGlucoseLevel(@PathVariable Integer id, @RequestParam String dateFormat, @RequestParam String date) throws CGMApplicationException {
         SimpleDateFormat simpleDateFormat = null;
         Date formatedDate = null;

@@ -1,7 +1,10 @@
 package com.CGMspringboot.service.patientService;
 
+import com.CGMspringboot.domain.entity.Admin;
+import com.CGMspringboot.domain.entity.Doctor;
 import com.CGMspringboot.domain.entity.Patient;
 import com.CGMspringboot.domain.entity.Role;
+import com.CGMspringboot.domain.repository.AdminRepository;
 import com.CGMspringboot.domain.repository.DoctorRepository;
 import com.CGMspringboot.domain.repository.PatientRepository;
 import com.CGMspringboot.exceptions.CGMApplicationException;
@@ -11,9 +14,11 @@ import com.CGMspringboot.exceptions.appUser.UserIdNotFoundException;
 import com.CGMspringboot.exceptions.appUser.UserPhoneNumberConflictException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -22,6 +27,8 @@ public class PatientServiceImpl implements PatientService{
 
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
+    private final AdminRepository adminRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Patient findPatientById(Integer patientId) throws UserIdNotFoundException {
@@ -45,6 +52,7 @@ public class PatientServiceImpl implements PatientService{
     public Patient registerNewPatient(Patient patient) throws CGMApplicationException {
         checkPatientEmailIsAvailable(patient.getEmail());
         checkPatientPhoneNumberIsAvailable(patient.getPhoneNumber());
+        patient.setPassword(passwordEncoder.encode(patient.getCnp()));
         patient.setRole(Role.PATIENT);
         log.info("save user {}", patient.getEmail());
         return patientRepository.save(patient);
@@ -62,11 +70,14 @@ public class PatientServiceImpl implements PatientService{
         findPatient.setFirstName(patient.getFirstName());
         findPatient.setLastName(patient.getLastName());
         findPatient.setEmail(patient.getEmail());
+        findPatient.setCnp(patient.getCnp());
+        findPatient.setGender(patient.getGender());
         findPatient.setPassword(patient.getPassword());
         findPatient.setPhoneNumber(patient.getPhoneNumber());
         findPatient.setAge(patient.getAge());
         findPatient.setWeightKg(patient.getWeightKg());
         findPatient.setHeightCm(patient.getHeightCm());
+        findPatient.setDiagnostic(patient.getDiagnostic());
         patientRepository.save(findPatient);
         log.info("updated user id {}", findPatient.getId());
         return findPatient;
@@ -102,5 +113,14 @@ public class PatientServiceImpl implements PatientService{
     @Override
     public List<Patient> findPatientsByDoctor(Integer doctorId) {
         return patientRepository.findAllByDoctorId(doctorId);
+    }
+
+    @Override
+    public List<Patient> findPatientsByDoctorEmail(String email) throws UserEmailNotFoundException {
+        Doctor doctor = doctorRepository.findByEmail(email).orElse(null);
+        if (doctor == null) {
+            throw new UserEmailNotFoundException(email);
+        }
+        return patientRepository.findAllByDoctorId(doctor.getId());
     }
 }

@@ -7,13 +7,13 @@ import {
   TextInput,
   Dimensions,
 } from "react-native";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSequence,
-  withSpring,
-  color,
-} from "react-native-reanimated";
+// import Animated, {
+//   useSharedValue,
+//   useAnimatedStyle,
+//   withSequence,
+//   withSpring,
+//   color,
+// } from "react-native-reanimated";
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import styles from "../../styles";
@@ -22,10 +22,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import colors from "../config/colors";
 import { Dropdown } from "react-native-element-dropdown";
 import { LineChart } from "react-native-chart-kit";
+import {
+  ChartDot,
+  ChartPath,
+  ChartPathProvider,
+} from "@rainbow-me/animated-charts";
 
 const { width, height } = Dimensions.get("window");
+
 export default function GlucoseMonitorScreen({ naviagtion }) {
-  const { login, logout } = useContext(AuthContext);
+  // const { login, logout } = useContext(AuthContext);
   const [editMode, setEditMode] = useState(false);
   const animatedScaleValue = useSharedValue(1);
   const [glucoseLevel, setGlucoseLevel] = useState(0);
@@ -37,20 +43,19 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
     { label: "Mg/dL", value: "mgdl" },
     { label: "Mmol/L", value: "mmol" },
   ]);
-
   // const items = [
   //   { label: "Mg/dL", value: "mgdl" },
   //   { label: "Mmol/L", value: "mmol" },
   // ];
 
-  const springAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: animatedScaleValue.value }],
-    };
-  });
+  // const springAnimatedStyle = useAnimatedStyle(() => {
+  //   return {
+  //     transform: [{ scale: animatedScaleValue.value }],
+  //   };
+  // });
 
   const addGlucoseLevel = () => {
-    animatedScaleValue.value = withSequence(withSpring(1.4), withSpring(1));
+    // animatedScaleValue.value = withSeq12uence(withSpring(1.4), withSpring(1));
     console.log("glucose level is " + glucoseLevel + " at time " + millis);
     console.log(csvString);
     setGlucoseLevel(0);
@@ -72,6 +77,14 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
     ],
   };
 
+  const prices = [
+    [1, 2],
+    [2, 3],
+    [3, 4],
+    [4, 4],
+    [5, 6],
+  ];
+
   var csvData = "column1,column2,column3\nvalue1,value2,value3";
 
   const csvString = csvData.toString();
@@ -83,7 +96,7 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
       </View>
       <View>
         <Text>Graph</Text>
-        <LineChart
+        {/* <LineChart
           data={graphData}
           width={width} // from react-native
           height={300}
@@ -109,9 +122,17 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
             marginVertical: 8,
             borderRadius: 16,
           }}
-        />
+        /> */}
       </View>
-
+      {/* <ChartPathProvider
+        data={{
+          points: prices.map((price) => ({ x: price[0], y: [price[1]] })),
+          smoothingStrategy: "bezier",
+        }}
+      >
+        <ChartPath height={800 / 2} stroke="yellow" width={500} />
+        <ChartDot style={{ backgroundColor: "blue" }} />
+      </ChartPathProvider> */}
       <View style={monitorStyles.addGlucoseContainer}>
         <View style={monitorStyles.inputGlucoseUnitContainer}>
           <TextInput

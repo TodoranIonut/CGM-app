@@ -13,6 +13,7 @@ public class DoctorResponseDTO {
     private String lastName;
     private String phoneNumber;
     private String email;
+    private String cnp;
     private Role role;
     private String clinic;
 }

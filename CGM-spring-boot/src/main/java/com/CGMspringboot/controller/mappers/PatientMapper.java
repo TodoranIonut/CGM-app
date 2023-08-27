@@ -25,12 +25,14 @@ public class PatientMapper {
         patientResponseDTO.setLastName(patient.getLastName());
         patientResponseDTO.setEmail(patient.getEmail());
         patientResponseDTO.setPhoneNumber(patient.getPhoneNumber());
+        patientResponseDTO.setCnp(patient.getCnp());
         patientResponseDTO.setRole(patient.getRole());
         patientResponseDTO.setGender(patient.getGender().name());
         patientResponseDTO.setAge(patient.getAge());
         patientResponseDTO.setWeightKg(patient.getWeightKg());
         patientResponseDTO.setHeightCm(patient.getHeightCm());
         patientResponseDTO.setDoctorId(patient.getDoctor().getId());
+        patientResponseDTO.setDiagnostic(patient.getDiagnostic().name());
 
         return patientResponseDTO;
     }
@@ -45,12 +47,13 @@ public class PatientMapper {
         patient.setFirstName(patientRequestDTO.getFirstName());
         patient.setLastName(patientRequestDTO.getLastName());
         patient.setEmail(patientRequestDTO.getEmail());
-        patient.setPassword(patientRequestDTO.getPassword());
         patient.setPhoneNumber(patientRequestDTO.getPhoneNumber());
+        patient.setCnp(patientRequestDTO.getCnp());
         patient.setGender(Patient.Gender.valueOf(patientRequestDTO.getGender()));
         patient.setAge(patientRequestDTO.getAge());
         patient.setWeightKg(patientRequestDTO.getWeightKg());
         patient.setHeightCm(patientRequestDTO.getHeightCm());
+        patient.setDiagnostic(Patient.Diagnostic.valueOf(patientRequestDTO.getDiagnostic()));
 
         Doctor doctor = new Doctor();
         doctor.setId(patientRequestDTO.getDoctorId());

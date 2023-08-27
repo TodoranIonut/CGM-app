@@ -38,9 +38,9 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers(authMatcher,h2Matcher).permitAll()
-                .anyRequest()
-                .authenticated()
+//                .requestMatchers(authMatcher,h2Matcher).permitAll()
+                .anyRequest().permitAll()
+//                .authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

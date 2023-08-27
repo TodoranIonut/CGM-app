@@ -18,14 +18,14 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/doctor")
+@RequestMapping("/api/doctor")
 public class DoctorController {
 
     private final DoctorService doctorService;
     private final DoctorMapper doctorMapper;
 
     @GetMapping("/id/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
+//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<DoctorResponseDTO> getDoctorById(@PathVariable Integer id) throws UserIdNotFoundException {
         Doctor doctor = doctorService.findDoctorById(id);
         DoctorResponseDTO doctorResponseDTO = doctorMapper.toDoctorResponseDTO(doctor);
@@ -33,7 +33,7 @@ public class DoctorController {
     }
 
     @GetMapping("/byEmail/{email}")
-    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
+//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<DoctorResponseDTO> getDoctorByEmail(@PathVariable String email) throws UserEmailNotFoundException {
         Doctor doctor = doctorService.findDoctorByEmail(email);
         DoctorResponseDTO doctorResponseDTO = doctorMapper.toDoctorResponseDTO(doctor);
@@ -41,7 +41,7 @@ public class DoctorController {
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<DoctorResponseDTO> registerDoctor(@RequestBody DoctorRequestDTO doctorRequestDTO) throws CGMApplicationException {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/doctor/register").toUriString());
         Doctor doctor = doctorMapper.toDoctor(doctorRequestDTO);
@@ -51,7 +51,7 @@ public class DoctorController {
     }
 
     @PutMapping("/update/id/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
+//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<DoctorResponseDTO> updateDoctor(@PathVariable Integer id, @RequestBody DoctorRequestDTO doctorRequestDTO) throws CGMApplicationException {
         Doctor doctor = doctorMapper.toDoctor(doctorRequestDTO);
         Doctor updatedDoctor = doctorService.updateDoctor(id,doctor);
@@ -60,7 +60,7 @@ public class DoctorController {
     }
 
     @DeleteMapping("/delete/id/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> deleteDoctorById(@PathVariable Integer id) {
         doctorService.deleteDoctorById(id);
         return ResponseEntity.ok().body("delete user id " + id);

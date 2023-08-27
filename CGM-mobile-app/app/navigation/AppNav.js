@@ -1,5 +1,5 @@
 import styles from "../../styles";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -10,46 +10,53 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 
 //screens
 import LoginScreen from "../screen/LoginScreen";
-import HomeScreen from "../screen/LoginScreen";
 import GlucoseMonitorScreen from "../screen/GlucoseMonitorScreen";
-import DeviceScreen from "../screen/DeviceScreen";
 import ProfileScreen from "../screen/ProfileScreen";
-import PacientsScreen from "../screen/PacientsScreen";
-import SettingsScreen from "../screen/SettingsScreen";
+import PatientsScreen from "../screen/PatientsScreen";
 import colors from "../config/colors";
+import AddPatientScreen from "../screen/AddPatientScreen";
 
 //screen names
-const homeName = "Home";
-const loginName = "Login";
 const glucoseMonitorName = "Monitor";
-const deviceName = "Device";
-const pacientsName = "Pacients";
+const patientsName = "Patients";
+const addPatientsName = "AddPatients";
 const profileName = "Profile";
-const settingsName = "Settings";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+const PatientsStack = createNativeStackNavigator();
+var role = "";
+
+const PatientsStackNavigator = () => (
+  <PatientsStack.Navigator initialRouteName={patientsName}>
+    <PatientsStack.Screen
+      options={{ headerShown: false }}
+      name={patientsName}
+      component={PatientsScreen}
+    ></PatientsStack.Screen>
+    <PatientsStack.Screen
+      options={{ headerShown: false }}
+      name={addPatientsName}
+      component={AddPatientScreen}
+    ></PatientsStack.Screen>
+  </PatientsStack.Navigator>
+);
+
 const BottomTabNavigator = () => (
   <Tab.Navigator
-    initialRouteName={homeName}
+    initialRouteName={profileName}
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
         let iconName;
         let rn = route.name;
 
-        if (rn === homeName) {
-          iconName = focused ? "home" : "home-outline";
-        } else if (rn === glucoseMonitorName) {
+        if (rn === glucoseMonitorName) {
           iconName = focused ? "analytics" : "analytics-outline";
-        } else if (rn === deviceName) {
-          iconName = focused ? "bluetooth" : "bluetooth-outline";
-        } else if (rn === pacientsName) {
+        } else if (rn === patientsName) {
           iconName = focused ? "people" : "people-outline";
         } else if (rn === profileName) {
           iconName = focused ? "person-circle" : "person-circle-outline";
-        } else if (rn === settingsName) {
-          iconName = focused ? "settings" : "settings-outline";
         }
 
         return <Ionicons name={iconName} size={size} color={color} />;
@@ -62,17 +69,22 @@ const BottomTabNavigator = () => (
       headerShown: false,
     })}
   >
-    <Tab.Screen name={glucoseMonitorName} component={GlucoseMonitorScreen} />
-    <Tab.Screen name={deviceName} component={DeviceScreen} />
-    <Tab.Screen name={pacientsName} component={PacientsScreen} />
+    {role === "ROLE_DOCTOR" ? (
+      <Tab.Screen name={patientsName} component={PatientsStackNavigator} />
+    ) : (
+      <Tab.Screen name={glucoseMonitorName} component={GlucoseMonitorScreen} />
+    )}
     <Tab.Screen name={profileName} component={ProfileScreen} />
-    <Tab.Screen name={settingsName} component={SettingsScreen} />
   </Tab.Navigator>
 );
 
 export function AppNav() {
-  const { login, logout, isLoading, userToken } = useContext(AuthContext);
+  useEffect(() => {
+    role = userRole;
+  }, []);
 
+  const { login, logout, isLoading, userToken, userName, userRole } =
+    useContext(AuthContext);
   if (isLoading) {
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <ActivityIndicator size="large" />
@@ -84,6 +96,7 @@ export function AppNav() {
       <Stack.Navigator>
         {userToken !== null ? (
           <Stack.Screen
+            initialRouteName="BottomTabNavigator"
             name="BottomTabNavigator"
             component={BottomTabNavigator}
             options={{ headerShown: false }}

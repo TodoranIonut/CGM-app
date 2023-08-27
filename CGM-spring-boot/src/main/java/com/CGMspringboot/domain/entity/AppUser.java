@@ -21,6 +21,7 @@ public abstract class AppUser {
     private String phoneNumber;
     private String email;
     private String password;
+    private String cnp;
 
     @Enumerated(EnumType.STRING)
     private Role role;

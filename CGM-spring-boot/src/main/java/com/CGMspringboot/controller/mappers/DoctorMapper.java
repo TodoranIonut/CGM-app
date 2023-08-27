@@ -19,6 +19,7 @@ public class DoctorMapper {
         doctorResponseDTO.setFirstName(doctor.getFirstName());
         doctorResponseDTO.setLastName(doctor.getLastName());
         doctorResponseDTO.setEmail(doctor.getEmail());
+        doctorResponseDTO.setCnp(doctor.getCnp());
         doctorResponseDTO.setPhoneNumber(doctor.getPhoneNumber());
         doctorResponseDTO.setRole(doctor.getRole());
         doctorResponseDTO.setClinic(doctor.getClinic());
@@ -37,6 +38,7 @@ public class DoctorMapper {
         doctor.setLastName(doctorRequestDTO.getLastName());
         doctor.setPhoneNumber(doctorRequestDTO.getPhoneNumber());
         doctor.setEmail(doctorRequestDTO.getEmail());
+        doctor.setCnp(doctorRequestDTO.getCnp());
         doctor.setPassword(doctorRequestDTO.getPassword());
         doctor.setClinic(doctorRequestDTO.getClinic());
 

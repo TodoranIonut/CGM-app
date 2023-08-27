@@ -59,6 +59,7 @@ public class DoctorServiceImpl implements DoctorService {
         }
         findDoctor.setFirstName(doctor.getFirstName());
         findDoctor.setLastName(doctor.getLastName());
+        findDoctor.setCnp(doctor.getCnp());
         findDoctor.setEmail(doctor.getEmail());
         findDoctor.setPassword(doctor.getPassword());
         findDoctor.setPhoneNumber(doctor.getPhoneNumber());
