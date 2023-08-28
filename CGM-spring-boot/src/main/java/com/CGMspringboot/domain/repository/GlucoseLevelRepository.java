@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface GlucoseLevelRepository extends JpaRepository<GlucoseLevel, Integer> {
 
-    List<GlucoseLevel> findAllByPatientIdAndTimeStampBetween(Integer patientId, long startDateTimeStamp, long endDateTimeStamp);
+    List<GlucoseLevel> findAllByPatientEmailAndTimestampBetween(String patientEmail, long startDateTimestamp, long endDateTimestamp);
+    List<GlucoseLevel> findAllByPatientEmailAndTimestampGreaterThanEqual(String patientEmail, long startDateTimestamp);
 }

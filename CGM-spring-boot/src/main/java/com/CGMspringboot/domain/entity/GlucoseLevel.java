@@ -18,7 +18,7 @@ public class GlucoseLevel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private long timeStamp;
+    private long timestamp;
     private float glucoseMgPerDl;
 
     @ManyToOne

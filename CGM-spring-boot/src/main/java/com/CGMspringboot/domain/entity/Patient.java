@@ -32,7 +32,6 @@ public class Patient extends AppUser {
         HEALTHY, DIABETES_I, DIABETES_II, GESTATIONAL
     }
 
-
     @ManyToOne
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;

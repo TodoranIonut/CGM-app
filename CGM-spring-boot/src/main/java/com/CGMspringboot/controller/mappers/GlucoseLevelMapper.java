@@ -4,6 +4,7 @@ import com.CGMspringboot.controller.dto.request.GlucoseLevelRequestDTO;
 import com.CGMspringboot.controller.dto.response.GlucoseLevelResponseDTO;
 import com.CGMspringboot.domain.entity.GlucoseLevel;
 import com.CGMspringboot.domain.entity.Patient;
+import com.CGMspringboot.domain.repository.PatientRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -18,10 +19,10 @@ public class GlucoseLevelMapper {
         }
         GlucoseLevel glucoseLevel = new GlucoseLevel();
         Patient patient = new Patient();
-        patient.setId(glucoseLevelRequestDTO.getPatientId());
+        patient.setEmail(glucoseLevelRequestDTO.getPatientEmail());
 
         glucoseLevel.setPatient(patient);
-        glucoseLevel.setTimeStamp(glucoseLevelRequestDTO.getTimeStamp());
+        glucoseLevel.setTimestamp(glucoseLevelRequestDTO.getTimeStamp());
         glucoseLevel.setGlucoseMgPerDl(glucoseLevelRequestDTO.getGlucoseMgPerDl());
 
         return glucoseLevel;
@@ -34,7 +35,7 @@ public class GlucoseLevelMapper {
 
         GlucoseLevelResponseDTO glucoseLevelResponseDTO = new GlucoseLevelResponseDTO();
 
-        glucoseLevelResponseDTO.setTimeStamp(glucoseLevel.getTimeStamp());
+        glucoseLevelResponseDTO.setTimeStamp(glucoseLevel.getTimestamp());
         glucoseLevelResponseDTO.setGlucoseMgPerDl(glucoseLevel.getGlucoseMgPerDl());
         return glucoseLevelResponseDTO;
     }

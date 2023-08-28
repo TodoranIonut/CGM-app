@@ -1,8 +1,10 @@
 package com.CGMspringboot.service.glucoseLevel;
 
 import com.CGMspringboot.domain.entity.GlucoseLevel;
+import com.CGMspringboot.domain.entity.Patient;
 import com.CGMspringboot.domain.repository.GlucoseLevelRepository;
 import com.CGMspringboot.domain.repository.PatientRepository;
+import com.CGMspringboot.exceptions.appUser.UserEmailNotFoundException;
 import com.CGMspringboot.exceptions.appUser.UserIdNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,25 +17,27 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class GlucoseLevelServiceImpl implements GlucoseLevelService{
+public class GlucoseLevelServiceImpl implements GlucoseLevelService {
 
     private final GlucoseLevelRepository glucoseLevelRepository;
     private final PatientRepository patientRepository;
 
     @Override
-    public GlucoseLevel saveGlucoseLevel(GlucoseLevel glucoseLevel) throws UserIdNotFoundException {
-        Integer patientId = glucoseLevel.getPatient().getId();
-        patientRepository.findById(patientId).orElseThrow(
-                ()-> new UserIdNotFoundException(patientId));
+    public GlucoseLevel saveGlucoseLevel(GlucoseLevel glucoseLevel) throws UserEmailNotFoundException {
+//        Integer patientId = glucoseLevel.getPatient().getId();
+        String patientEmail = glucoseLevel.getPatient().getEmail();
+        Patient patient = patientRepository.findByEmail(patientEmail).orElseThrow(
+                () -> new UserEmailNotFoundException(patientEmail));
 
-        if(glucoseLevel.getTimeStamp() == 0){
-            glucoseLevel.setTimeStamp(System.currentTimeMillis());
+        glucoseLevel.setPatient(patient);
+        if (glucoseLevel.getTimestamp() == 0) {
+            glucoseLevel.setTimestamp(System.currentTimeMillis());
         }
         return glucoseLevelRepository.save(glucoseLevel);
     }
 
     @Override
-    public List<GlucoseLevel> getGlucoseLevelByDate(Date date,Integer patientId) {
+    public List<GlucoseLevel> getGlucoseLevelByDate(Date date, String patientEmail) {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -46,7 +50,18 @@ public class GlucoseLevelServiceImpl implements GlucoseLevelService{
         calendar.set(Calendar.SECOND, 59);
         long endDate = calendar.getTimeInMillis();
 
-        List<GlucoseLevel> patientDailyGlucose = glucoseLevelRepository.findAllByPatientIdAndTimeStampBetween(patientId,startDate,endDate);
+        List<GlucoseLevel> patientDailyGlucose = glucoseLevelRepository.findAllByPatientEmailAndTimestampBetween(patientEmail, startDate, endDate);
         return patientDailyGlucose;
+    }
+
+    @Override
+    public List<GlucoseLevel> getGlucoseLevelByTimestamp(String patientEmail, long startTimestamp, long endTimestamp) {
+        return glucoseLevelRepository.findAllByPatientEmailAndTimestampBetween(patientEmail, startTimestamp, endTimestamp);
+    }
+
+
+    @Override
+    public List<GlucoseLevel> getGlucoseLevelAfterStartTimestamp(String patientEmail, long startTimestamp) {
+        return glucoseLevelRepository.findAllByPatientEmailAndTimestampGreaterThanEqual(patientEmail,startTimestamp);
     }
 }

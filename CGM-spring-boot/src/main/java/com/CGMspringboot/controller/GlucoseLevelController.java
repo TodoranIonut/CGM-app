@@ -1,10 +1,12 @@
 package com.CGMspringboot.controller;
 
+import com.CGMspringboot.controller.dto.request.GetGlucoseLevelRequestDTO;
 import com.CGMspringboot.controller.dto.request.GlucoseLevelRequestDTO;
 import com.CGMspringboot.controller.dto.response.GlucoseLevelResponseDTO;
 import com.CGMspringboot.controller.mappers.GlucoseLevelMapper;
 import com.CGMspringboot.domain.entity.GlucoseLevel;
 import com.CGMspringboot.exceptions.CGMApplicationException;
+import com.CGMspringboot.exceptions.appUser.UserEmailNotFoundException;
 import com.CGMspringboot.exceptions.appUser.UserIdNotFoundException;
 import com.CGMspringboot.exceptions.date.InvalidDateFormatException;
 import com.CGMspringboot.service.glucoseLevel.GlucoseLevelService;
@@ -32,17 +34,17 @@ public class GlucoseLevelController {
 
     @PostMapping("/save")
 //    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
-    public ResponseEntity<GlucoseLevelResponseDTO> saveGlucoseLevel(@RequestBody GlucoseLevelRequestDTO glucoseLevelRequestDTO) throws UserIdNotFoundException {
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/glucose/save").toUriString());
+    public ResponseEntity<GlucoseLevelResponseDTO> saveGlucoseLevel(@RequestBody GlucoseLevelRequestDTO glucoseLevelRequestDTO) throws UserEmailNotFoundException {
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/glucose/save").toUriString());
         GlucoseLevel glucoseLevel = glucoseLevelMapper.toGlucoseLevel(glucoseLevelRequestDTO);
         GlucoseLevel savedGlucoseLevel = glucoseLevelService.saveGlucoseLevel(glucoseLevel);
         GlucoseLevelResponseDTO glucoseLevelResponseDTO = glucoseLevelMapper.toGlucoseLevelResponseDTO(savedGlucoseLevel);
         return ResponseEntity.created(uri).body(glucoseLevelResponseDTO);
     }
 
-    @GetMapping("/byDate/patient/id/{id}")
+    @GetMapping("/byDate/patient/email/{email}")
 //    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
-    public ResponseEntity<List<GlucoseLevelResponseDTO>> getDailyGlucoseLevel(@PathVariable Integer id, @RequestParam String dateFormat, @RequestParam String date) throws CGMApplicationException {
+    public ResponseEntity<List<GlucoseLevelResponseDTO>> getDailyGlucoseLevel(@PathVariable String email, @RequestParam String dateFormat, @RequestParam String date) throws CGMApplicationException {
         SimpleDateFormat simpleDateFormat = null;
         Date formatedDate = null;
         try {
@@ -51,10 +53,27 @@ public class GlucoseLevelController {
         } catch (IllegalArgumentException | ParseException e) {
             throw new InvalidDateFormatException();
         }
-        List<GlucoseLevel> dalyGlucoseLevel = glucoseLevelService.getGlucoseLevelByDate(formatedDate, id);
+        List<GlucoseLevel> dalyGlucoseLevel = glucoseLevelService.getGlucoseLevelByDate(formatedDate, email);
         List<GlucoseLevelResponseDTO> responseList = glucoseLevelMapper.toGlucoseLevelResponseDTOList(dalyGlucoseLevel);
         return ResponseEntity.ok().body(responseList);
     }
+
+    @PostMapping("/byTimestamp")
+//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+    public ResponseEntity<List<GlucoseLevelResponseDTO>> getGlucoseStartWithSpecificTimestamp(@RequestBody GetGlucoseLevelRequestDTO getGlucoseLevelRequestDTO) {
+        List<GlucoseLevel> dalyGlucoseLevel = glucoseLevelService.getGlucoseLevelAfterStartTimestamp(getGlucoseLevelRequestDTO.getPatientEmail(), getGlucoseLevelRequestDTO.getStartTimestamp());
+        List<GlucoseLevelResponseDTO> responseList = glucoseLevelMapper.toGlucoseLevelResponseDTOList(dalyGlucoseLevel);
+        return ResponseEntity.ok().body(responseList);
+    }
+
+    @PostMapping("/byTimestampInterval")
+//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+    public ResponseEntity<List<GlucoseLevelResponseDTO>> getGlucoseByTimestampInterval(@RequestBody GetGlucoseLevelRequestDTO getGlucoseLevelRequestDTO) {
+        List<GlucoseLevel> dalyGlucoseLevel = glucoseLevelService.getGlucoseLevelByTimestamp(getGlucoseLevelRequestDTO.getPatientEmail(), getGlucoseLevelRequestDTO.getStartTimestamp(), getGlucoseLevelRequestDTO.getEndTimestamp());
+        List<GlucoseLevelResponseDTO> responseList = glucoseLevelMapper.toGlucoseLevelResponseDTOList(dalyGlucoseLevel);
+        return ResponseEntity.ok().body(responseList);
+    }
+
 
     @GetMapping("/upload")
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")

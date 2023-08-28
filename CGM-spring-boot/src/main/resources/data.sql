@@ -12,8 +12,8 @@ insert into patient (first_name,last_name,phone_number,email,password,cnp,role,g
 ('Gabriela','Jurca','07949426', 'gabijurca@gmail.com','$2a$05$GIny7PaavzM8fcWL3ewJDeEFvTzd/L4lty7XxxclNeiFLfopL3rq2','2870114017543','PATIENT','FEMALE','GESTATIONAL',34,156.1,67.6,1),
 ('Gomoa','Felix','0743254397', 'gomoafelix@gmail.com','$2a$05$GIny7PaavzM8fcWL3ewJDeEFvTzd/L4lty7XxxclNeiFLfopL3rq2','1950805015362','PATIENT','MALE','DIABETES_I',54,146.4,78.9,1);
 
-insert into glucose_level (time_stamp,glucose_mg_per_dl,patient_id) values
-(1682265922089,154.7,1),
+insert into glucose_level (timestamp,glucose_mg_per_dl,patient_id) values
+(1682261138000,154.7,1),
 (1682262138000,175.3,1),
 (1682263138000,180.4,1),
 (1682264138000,140.5,1),
