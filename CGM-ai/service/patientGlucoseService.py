@@ -112,6 +112,8 @@ def estimate_glucose_level_until_specific_data(patientId: str, untilDateTime: in
     lastDateTime = dataset['timestamp'].values[-1]
     # lastDateString = datetime.datetime.fromtimestamp(int(lastDateTime))
 
+    glicemiaStatus = "HEALTHY"
+
     while untilDateTime > lastDateTime:
         print(datetime.datetime.fromtimestamp(lastDateTime))
         # dt = dataset['timestamp'].values
@@ -120,6 +122,20 @@ def estimate_glucose_level_until_specific_data(patientId: str, untilDateTime: in
         # trainInputs, testInputs = splitData(dataset)
         print("total=", len(dataset))
         trainData = dataset['glicemia'].values
+
+
+        # hiperglicemia = any(glicemiaValue >= 200 for glicemiaValue in trainData)
+        #
+        # if hiperglicemia:
+        #     glicemiaStatus = "HIPERGLICEMIA"
+        # else:
+        #     hipoglicemia = any(glicemiaValue <= 65 for glicemiaValue in trainData)
+        #     if hipoglicemia:
+        #         glicemiaStatus = "HIPOGLICEMIA"
+        #
+        # if glicemiaStatus != "HEALTHY":
+        #     break
+
         trainData = trainData.reshape(-1, 1)
 
         train_network_model(trainData, saveModelFilePath)
@@ -134,3 +150,4 @@ def estimate_glucose_level_until_specific_data(patientId: str, untilDateTime: in
 
     # return lastDateString
     return datetime.datetime.fromtimestamp(lastDateTime)
+    # return glicemiaStatus

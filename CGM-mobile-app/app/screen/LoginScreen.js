@@ -56,7 +56,7 @@ function LoginScreen(props) {
       style={styles.container}
     >
       <Animated.View style={[springAnimatedStyle, styles.logoContainer]}>
-        <Text style={styles.logoText}> CGM </Text>
+        <Text style={styles.logoText}> GMA </Text>
         <Molecule />
       </Animated.View>
       <View style={styles.bottomContainer}>

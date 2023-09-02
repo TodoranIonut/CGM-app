@@ -53,7 +53,7 @@ def train_network_model(trainData, savingFile):
     # Compiling the RNN
     regressor.compile(optimizer='rmsprop', loss='mean_squared_error')
     # Fitting to the training set
-    regressor.fit(X_train, y_train, epochs=3, batch_size=32)
+    regressor.fit(X_train, y_train, epochs=100, batch_size=32)
 
     if len(savingFile) > 0:
         regressor.save(savingFile,overwrite=True,include_optimizer=True)
@@ -79,11 +79,13 @@ def estimate_using_model(patientId):
 
     sc = MinMaxScaler(feature_range=(0, 1))
     training_set_scaled = sc.fit_transform(trainData)
-
+    n_size = len(dataset['glicemia'].values)
     trainX = []
     trainY = []
     n_future = 24
     n_past = 60
+    # n_future = int(n_size/24)
+    # n_past =
     # v = len(training_set_scaled) - n_future + 1
     # print("npast ", n_past, " la ", v)
     for i in range(n_past, len(training_set_scaled) - n_future + 1):
@@ -94,8 +96,11 @@ def estimate_using_model(patientId):
 
     regressor = load_model(modelFilePath)
 
-    n_past = 144
-    n_days_for_prediction = 288
+
+    # n_past = 144
+    # n_days_for_prediction = 288
+    n_past = int(n_size/4)
+    n_days_for_prediction = int(n_size/2)
 
     prediction = regressor.predict(trainX[-n_days_for_prediction:])
     trainTimestamp = dataset['timestamp'].values

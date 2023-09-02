@@ -24,7 +24,11 @@ import { Dropdown } from "react-native-element-dropdown";
 import { LineChart } from "react-native-chart-kit";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
-import { BASE_URL, GET_PATIENTS_BY_DOCTOR_EMAIL } from "../config/config";
+import {
+  BASE_URL,
+  GET_PATIENTS_BY_DOCTOR_EMAIL,
+  POST_GLUCOSE_COMPUTE,
+} from "../config/config";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScrollView } from "react-native-gesture-handler";
@@ -40,7 +44,8 @@ export default function PatientsScreen({ navigation }) {
   const [patients, setPatients] = useState([]);
   const [selectedPatientId, setSelectedPatientId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [estimateDays, setEstimateDays] = useState(0);
+  const [predictedDiagnostic, setPredictedDiagnostic] = useState();
   // patients.map((data) => {
   //   return;
   // });
@@ -66,22 +71,26 @@ export default function PatientsScreen({ navigation }) {
       });
   };
 
-  // const handleEditBookClick = (e, book) => {
-  //   e.preventDefault();
-  //   setEditBookId(book.id);
-
-  //   const formValues = {
-  //     id: book.id,
-  //     title: book.title,
-  //     author: book.author,
-  //     status: book.status,
-  //   };
+  const predictDiacnostic = async (emailPatient) => {
+    console.log("start traning");
+    await axios
+      .post(`${BASE_URL}${POST_GLUCOSE_COMPUTE}`, {
+        patientEmail: emailPatient,
+        days: estimateDays,
+      })
+      .then((res) => {
+        console.log(res.data);
+        setPredictedDiagnostic(res.data);
+      })
+      .catch((e) => {
+        console.log(`Login error ${e}`);
+      });
+  };
 
   const statusStyles = {
     HEALTHY: { color: colors.mintGreenDark },
     DIABETES_II: { color: colors.yellowStatus },
     DIABETES_I: { color: colors.redStatus },
-    GESTATIONAL: { color: colors.yellowStatus },
   };
 
   const viewPatientData = (patientId) => {
@@ -106,6 +115,12 @@ export default function PatientsScreen({ navigation }) {
         }
       })
       .map((item) => {
+        const AiButton = () => {
+          {
+            item.diagnostic === "HEALTHY" ? <Text>Asdasd</Text> : null;
+          }
+        };
+
         return (
           <Pressable onPress={() => viewPatientData(item.patientId)}>
             <View style={patientsStyle.patientDataContainer}>
@@ -134,6 +149,35 @@ export default function PatientsScreen({ navigation }) {
                       <Text style={patientsStyle.leftPatientData}>
                         Weight:
                       </Text>,
+                      item.diagnostic === "HEALTHY" ||
+                      item.diagnostic === "DIABETES_II"
+                        ? [
+                            <Pressable
+                              style={patientsStyle.trainButton}
+                              onPress={predictDiacnostic(item.email)}
+                            >
+                              <Text style={patientsStyle.trainButtonText}>
+                                Show Istoric
+                              </Text>
+                            </Pressable>,
+                            <View style={patientsStyle.trainButton}>
+                              <TextInput
+                                placeholder="Number of Days"
+                                placeholderTextColor="white"
+                                keyboardType="numeric"
+                                maxLength={3}
+                                value={estimateDays}
+                                onChangeText={(estimateDays) =>
+                                  setEstimateDays(estimateDays)
+                                }
+                                style={patientsStyle.textInput}
+                              />
+                            </View>,
+                            <Text style={patientsStyle.leftPatientData}>
+                              Computed Status:
+                            </Text>,
+                          ]
+                        : null,
                     ]
                   : [
                       <Text style={patientsStyle.leftPatientData}>Name: </Text>,
@@ -180,6 +224,43 @@ export default function PatientsScreen({ navigation }) {
                       <Text style={patientsStyle.rightPatientData}>
                         {item.weightKg} kg
                       </Text>,
+                      item.diagnostic === "HEALTHY" ||
+                      item.diagnostic === "DIABETES_II"
+                        ? [
+                            <Pressable
+                              style={patientsStyle.trainButton}
+                              onPress={predictDiacnostic(item.email)}
+                            >
+                              <Text style={patientsStyle.trainButtonText}>
+                                Delete
+                              </Text>
+                            </Pressable>,
+                            <Pressable
+                              style={patientsStyle.trainButton}
+                              onPress={predictDiacnostic(item.email)}
+                            >
+                              <Text
+                                style={[
+                                  patientsStyle.trainButtonText,
+                                  // { color: colors.babyBlue },
+                                ]}
+                              >
+                                Compute Diagnostic
+                              </Text>
+                            </Pressable>,
+
+                            <Text
+                              style={[
+                                patientsStyle.rightPatientData,
+                                // statusStyles[item.diagnostic],
+                                { color: colors.babyBlue },
+                              ]}
+                            >
+                              {/* {predictedDiagnostic} */}
+                              HIPERGLICEMIA
+                            </Text>,
+                          ]
+                        : null,
                     ]
                   : [
                       <Text style={patientsStyle.rightPatientData}>
@@ -253,13 +334,14 @@ const patientsStyle = StyleSheet.create({
     color: colors.absoluteWhite,
     borderRadius: 12,
     textAlignVertical: "center",
+    textDecorationColor: "rgba(0, 0, 0, 0.2)",
   },
   allpatientsContainer: {
     flex: 1,
     // justifyContent: "flex-end",
     // alignItems: "center",
     // marginBottom: "5%",
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    // backgroundColor: "rgba(0, 0, 0, 0.2)",
   },
   patientDataContainer: {
     borderRadius: 9,
@@ -270,32 +352,17 @@ const patientsStyle = StyleSheet.create({
     flexDirection: "row",
   },
   headerText: {
-    color: colors.absoluteWhite,
+    color: colors.mintGreenDark,
     paddingLeft: "5%",
     fontWeight: "500",
   },
   textInput: {
-    flex: 1,
-    height: 50,
-    // width: width / 2,
-    borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
     borderColor: colors.absoluteWhite,
     color: colors.absoluteWhite,
-    marginHorizontal: 25,
+    alignSelf: "center",
     textAlign: "center",
-    // marginTop: 30,
-    borderRadius: 25,
-    marginLeft: 20,
-    backgroundColor: colors.grey,
-    shadowColor: colors.absoluteWhite,
-    marginRight: 20,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   button: {
     backgroundColor: colors.grey,
@@ -332,10 +399,41 @@ const patientsStyle = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
+  computedStatus: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: colors.babyBlue,
+  },
   boxLeft: {
     flex: 0.5,
   },
   boxRight: {
     flex: 0.5,
+  },
+  trainButton: {
+    backgroundColor: colors.grey,
+    height: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: colors.absoluteWhite,
+    shadowColor: colors.absoluteWhite,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginTop: 25,
+    marginBottom: 5,
+    marginRight: 20,
+  },
+  trainButtonText: {
+    fontSize: 15,
+    fontWeight: "400",
+    color: colors.absoluteWhite,
+    letterSpacing: 0.5,
   },
 });

@@ -52,7 +52,7 @@ def estimate_glicemia_api(patientId: str):
     return patientId
 
 
-@app.get("/api/multiple/{patientId}/{untilTimestamp}")
+@app.get("/api/computeDiagnostic/{patientId}/{untilTimestamp}")
 def estimate_high_glicemia_api(patientId: str, untilTimestamp: int):
     # untilDateTime = datetime.datetime(2023, 6, 20, 15, 45, 15)
     # untilTimestamp = int(untilTimestamp)

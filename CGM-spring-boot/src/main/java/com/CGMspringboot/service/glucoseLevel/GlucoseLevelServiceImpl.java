@@ -31,7 +31,7 @@ public class GlucoseLevelServiceImpl implements GlucoseLevelService {
 
         glucoseLevel.setPatient(patient);
         if (glucoseLevel.getTimestamp() == 0) {
-            glucoseLevel.setTimestamp(System.currentTimeMillis());
+            glucoseLevel.setTimestamp(System.currentTimeMillis()/1000);
         }
         return glucoseLevelRepository.save(glucoseLevel);
     }
@@ -44,11 +44,11 @@ public class GlucoseLevelServiceImpl implements GlucoseLevelService {
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
-        long startDate = calendar.getTimeInMillis();
+        long startDate = calendar.getTimeInMillis() / 1000;
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
-        long endDate = calendar.getTimeInMillis();
+        long endDate = calendar.getTimeInMillis() / 1000;
 
         List<GlucoseLevel> patientDailyGlucose = glucoseLevelRepository.findAllByPatientEmailAndTimestampBetween(patientEmail, startDate, endDate);
         return patientDailyGlucose;

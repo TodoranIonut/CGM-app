@@ -16,4 +16,11 @@ export default {
   pinkLight: "rgba(255, 152, 255, 1)",
   redStatus: "rgba(214, 29, 29, 1)",
   yellowStatus: "rgba(204, 152, 34, 0.89)",
+  loginBackground: "rgba(25, 25, 25, 0.80)",
+  // loginBackground: "rgba(50, 50, 50, 0.73)",
+  babyBlue: "rgba(0, 207, 255, 0.8)",
+  // moleculeColor: "rgba(214, 255, 221, 0.8)",
+  // moleculeColor: "rgba(191, 253, 195, 0.8)",
+  moleculeColor: "rgba(193, 255, 193, 0.8)",
+  blueStatus: "rgba(0, 207, 255, 0.8)",
 };

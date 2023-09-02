@@ -47,6 +47,11 @@ export default function AddPatientScreen({ navigation }) {
   const [doctorId, setDoctorId] = useState(1);
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState(null);
+  const [diagnostic, setDiagnostic] = useState([
+    { label: "HEALTHY", value: "HEALTHY" },
+    { label: "DIABETE_I", value: "DIABETE_I" },
+    { label: "DIABETE_II", value: "DIABETE_II" },
+  ]);
 
   const validateUserPatientData = () => {
     if (email == "") {
@@ -77,11 +82,11 @@ export default function AddPatientScreen({ navigation }) {
     return true;
   };
 
-  const savePatientData = () => {
+  const savePatientData = async () => {
     const makePost = validateUserPatientData();
 
     if (makePost == true) {
-      axios
+      await axios
         .post(`${BASE_URL}${REGISTER_PATH}`, {
           firstName: firstName,
           lastName: lastName,
@@ -222,6 +227,37 @@ export default function AddPatientScreen({ navigation }) {
               value={weightKg}
               onChangeText={(weightKg) => setWeightKg(weightKg)}
               style={styles.textInput}
+            />
+            <Dropdown
+              style={{
+                height: 50,
+                borderWidth: 1.5,
+                borderColor: "white",
+                color: "white",
+                marginHorizontal: 25,
+                marginTop: 30,
+                borderRadius: 25,
+                paddingLeft: 20,
+                backgroundColor: colors.grey,
+                shadowColor: colors.absoluteWhite,
+              }}
+              data={diagnostic}
+              placeholder={"Diagnostic"}
+              selectedTextStyle={{ fontSize: 16, color: colors.absoluteWhite }}
+              inputSearchStyle={{
+                height: 50,
+                fontSize: 12,
+                backgroundColor: colors.absoluteBlack,
+              }}
+              placeholderStyle={{ color: colors.absoluteWhite }}
+              labelField="label"
+              valueField="value"
+              onBlur={() => setIsFocus(true)}
+              onFocus={() => setIsFocus(false)}
+              onChange={(diagnostic) => {
+                setValue(diagnostic.value);
+                setIsFocus(false);
+              }}
             />
           </View>
         </ScrollView>

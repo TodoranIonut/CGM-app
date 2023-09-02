@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
   logoContainer: {
     flex: 1,
     // backgroundColor: colors.absoluteBlack,
-    // backgroundColor: colors.absoluteWhite,
+    backgroundColor: colors.loginBackground,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   bottomContainer: {
     flex: 1,
     justifyContent: "flex-start",
-    // backgroundColor: colors.absoluteBlack,
+    backgroundColor: colors.loginBackground,
   },
 
   button: {

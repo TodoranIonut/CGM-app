@@ -5,9 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GlucoseLevelRequestDTO {
+public class ComputePatientGlucoseRequestDTO {
 
     private String patientEmail;
-//    private long timeStamp;
-    private float glucoseMgPerDl;
+    private int days;
 }

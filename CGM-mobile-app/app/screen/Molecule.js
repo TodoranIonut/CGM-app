@@ -96,7 +96,7 @@ function Molecule(props) {
           start={vec(100, 100)}
           // end={endGradientCoordinate}
           end={vec(200, 200)}
-          colors={[colors.absoluteBlack, colors.absoluteWhite]}
+          colors={[colors.absoluteWhite, colors.moleculeColor]}
         />
       </Path>
     </Canvas>

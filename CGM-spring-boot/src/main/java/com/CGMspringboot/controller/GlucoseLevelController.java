@@ -1,5 +1,6 @@
 package com.CGMspringboot.controller;
 
+import com.CGMspringboot.controller.dto.request.ComputePatientGlucoseRequestDTO;
 import com.CGMspringboot.controller.dto.request.GetGlucoseLevelRequestDTO;
 import com.CGMspringboot.controller.dto.request.GlucoseLevelRequestDTO;
 import com.CGMspringboot.controller.dto.response.GlucoseLevelResponseDTO;
@@ -9,8 +10,10 @@ import com.CGMspringboot.exceptions.CGMApplicationException;
 import com.CGMspringboot.exceptions.appUser.UserEmailNotFoundException;
 import com.CGMspringboot.exceptions.appUser.UserIdNotFoundException;
 import com.CGMspringboot.exceptions.date.InvalidDateFormatException;
+import com.CGMspringboot.service.aiService.ComputingService;
 import com.CGMspringboot.service.glucoseLevel.GlucoseLevelService;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +34,7 @@ public class GlucoseLevelController {
 
     private final GlucoseLevelService glucoseLevelService;
     private final GlucoseLevelMapper glucoseLevelMapper;
+    private final ComputingService computingService;
 
     @PostMapping("/save")
 //    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
@@ -74,16 +78,8 @@ public class GlucoseLevelController {
         return ResponseEntity.ok().body(responseList);
     }
 
-
-    @GetMapping("/upload")
-    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
-//    public ResponseEntity<String> saveGlucoseFileData(@RequestParam("file")MultipartFile file) throws IOException {
-    public ResponseEntity<String> saveGlucoseFileData() throws IOException {
-        RestTemplate restTemplate = new RestTemplate();
-        String fooResourceUrl
-                = "http://localhost:8000";
-        ResponseEntity<String> response = restTemplate.getForEntity(fooResourceUrl, String.class);
-        return response;
+    @PostMapping("/compute")
+    public ResponseEntity<String> computeAndEstimateFutureGlucoseLevels(@RequestBody ComputePatientGlucoseRequestDTO computePatientGlucoseRequestDTO) throws UserEmailNotFoundException {
+        return computingService.computeDiagnostic(computePatientGlucoseRequestDTO.getPatientEmail(), computePatientGlucoseRequestDTO.getDays());
     }
-
 }

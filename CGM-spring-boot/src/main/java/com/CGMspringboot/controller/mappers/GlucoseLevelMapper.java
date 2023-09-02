@@ -22,7 +22,7 @@ public class GlucoseLevelMapper {
         patient.setEmail(glucoseLevelRequestDTO.getPatientEmail());
 
         glucoseLevel.setPatient(patient);
-        glucoseLevel.setTimestamp(glucoseLevelRequestDTO.getTimeStamp());
+//        glucoseLevel.setTimestamp(glucoseLevelRequestDTO.getTimeStamp());
         glucoseLevel.setGlucoseMgPerDl(glucoseLevelRequestDTO.getGlucoseMgPerDl());
 
         return glucoseLevel;

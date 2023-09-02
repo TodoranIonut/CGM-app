@@ -81,7 +81,7 @@ const BottomTabNavigator = () => (
 export function AppNav() {
   useEffect(() => {
     role = userRole;
-  }, []);
+  }, [role]);
 
   const { login, logout, isLoading, userToken, userName, userRole } =
     useContext(AuthContext);

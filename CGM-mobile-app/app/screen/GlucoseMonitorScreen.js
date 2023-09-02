@@ -6,142 +6,197 @@ import {
   Pressable,
   TextInput,
   Dimensions,
+  TouchableHighlight,
+  TouchableOpacity,
 } from "react-native";
-// import Animated, {
-//   useSharedValue,
-//   useAnimatedStyle,
-//   withSequence,
-//   withSpring,
-//   color,
-// } from "react-native-reanimated";
-import React, { useContext, useState } from "react";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSequence,
+  withSpring,
+  color,
+} from "react-native-reanimated";
+import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import styles from "../../styles";
-// import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import colors from "../config/colors";
 import { Dropdown } from "react-native-element-dropdown";
-import { LineChart } from "react-native-chart-kit";
+import { VictoryLine, Curve, VictoryLabel, VictoryChart } from "victory-native";
+import axios from "axios";
 import {
-  ChartDot,
-  ChartPath,
-  ChartPathProvider,
-} from "@rainbow-me/animated-charts";
-
+  BASE_URL,
+  POST_PATIENT_GLUCOSE_START_TIMESTAMP,
+  POST_GLUCOSE_SAVE,
+} from "../config/config";
+import { ScrollView } from "react-native-gesture-handler";
+import { Alert } from "react-native";
 const { width, height } = Dimensions.get("window");
 
 export default function GlucoseMonitorScreen({ naviagtion }) {
-  // const { login, logout } = useContext(AuthContext);
-  const [editMode, setEditMode] = useState(false);
+  const { login, logout, isLoggedIn, userToken, userName, userRole } =
+    useContext(AuthContext);
   const animatedScaleValue = useSharedValue(1);
-  const [glucoseLevel, setGlucoseLevel] = useState(0);
-  const millis = Date.now();
-
+  const [glucose, setGlucose] = useState(0);
+  const [glucoseRecords, setGlucoseRecords] = useState([]);
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("mgdl");
   const [items, setItems] = useState([
     { label: "Mg/dL", value: "mgdl" },
     { label: "Mmol/L", value: "mmol" },
   ]);
-  // const items = [
-  //   { label: "Mg/dL", value: "mgdl" },
-  //   { label: "Mmol/L", value: "mmol" },
-  // ];
 
-  // const springAnimatedStyle = useAnimatedStyle(() => {
-  //   return {
-  //     transform: [{ scale: animatedScaleValue.value }],
-  //   };
-  // });
+  const [intervalTimestamp, setIntervalTimestamp] = useState(3 * 60 * 60);
+  const [clickedId, setClickedId] = useState(0);
 
-  const addGlucoseLevel = () => {
-    // animatedScaleValue.value = withSeq12uence(withSpring(1.4), withSpring(1));
-    console.log("glucose level is " + glucoseLevel + " at time " + millis);
-    console.log(csvString);
-    setGlucoseLevel(0);
+  const springAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: animatedScaleValue.value }],
+    };
+  });
+
+  const addGlucoseLevel = async () => {
+    animatedScaleValue.value = withSequence(withSpring(1.4), withSpring(1));
+    console.log("add glucose from");
+    console.log(glucose);
+    if (value === "mmol") {
+      setGlucose(glucose * 18);
+    }
+
+    console.log(glucose);
+    console.log(userName);
+    if (glucose < 50 || glucose > 250) {
+      Alert.alert(
+        "Invalid glucose value!",
+        "Glucose value should be between 50 and 250 MG/DL"
+      );
+    } else {
+      await axios
+        .post(`${BASE_URL}${POST_GLUCOSE_SAVE}`, {
+          patientEmail: userName,
+          glucoseMgPerDl: glucose,
+        })
+        .then((res) => {})
+        .catch((e) => {
+          console.log(`Add glucose error ${e}`);
+        });
+
+      getGlucoseLevelStartingWithTimestamp();
+    }
+
+    setGlucose(null);
   };
 
-  var graphData = {
-    labels: ["January", "February", "March", "April", "May", "June"],
-    datasets: [
-      {
-        data: [
-          Math.random() * 200,
-          Math.random() * 100,
-          Math.random() * 100,
-          Math.random() * 100,
-          Math.random() * 100,
-          Math.random() * 100,
-        ],
-      },
-    ],
+  const getGlucoseLevelStartingWithTimestamp = async () => {
+    const lastViewTimestamp = Math.floor(Date.now() / 1000) - intervalTimestamp;
+    await axios
+      .post(`${BASE_URL}${POST_PATIENT_GLUCOSE_START_TIMESTAMP}`, {
+        patientEmail: userName,
+        startTimestamp: lastViewTimestamp,
+      })
+      .then((res) => {
+        console.log(res.data);
+        setGlucoseRecords(res.data);
+      })
+      .catch((e) => {
+        console.log(`Login error ${e}`);
+      });
+  };
+  const ButtonGroup = ({ buttons }) => {
+    const handleClick = (index) => {
+      setClickedId(index);
+      console.log("Clicked id", index);
+      "1H", "3H", "6H", "12H", "1D", "2D";
+      if (index === 0) {
+        setIntervalTimestamp(1 * 60 * 60); //1 hours
+      } else if (index === 1) {
+        setIntervalTimestamp(3 * 60 * 60); //3 hours
+      } else if (index === 2) {
+        setIntervalTimestamp(6 * 60 * 60); //6 hours
+      } else if (index === 3) {
+        setIntervalTimestamp(12 * 60 * 60); //1 month
+      } else if (index === 4) {
+        setIntervalTimestamp(24 * 60 * 60); //1 day
+      } else if (index === 5) {
+        setIntervalTimestamp(2 * 24 * 60 * 60); //2 day
+      }
+      getGlucoseLevelStartingWithTimestamp();
+    };
+
+    return (
+      <View style={monitorStyles.timeRangButtonsContainer}>
+        {buttons.map((buttonLabel, index) => {
+          return (
+            <TouchableOpacity
+              onPress={() => handleClick(index)}
+              style={[
+                index === clickedId
+                  ? monitorStyles.timeRangeButton
+                  : monitorStyles.timeRangeButtonActive,
+              ]}
+              key={index}
+            >
+              <Text
+                style={[
+                  index === clickedId
+                    ? monitorStyles.timeRangeButtonsText
+                    : monitorStyles.timeRangeButtonsTextActive,
+                ]}
+              >
+                {buttonLabel}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    );
   };
 
-  const prices = [
-    [1, 2],
-    [2, 3],
-    [3, 4],
-    [4, 4],
-    [5, 6],
-  ];
-
-  var csvData = "column1,column2,column3\nvalue1,value2,value3";
-
-  const csvString = csvData.toString();
+  useEffect(() => {
+    getGlucoseLevelStartingWithTimestamp();
+  }, [intervalTimestamp]);
 
   return (
     <SafeAreaView style={monitorStyles.glucoseMonitorContainer}>
       <View style={monitorStyles.headerContainer}>
         <Text style={monitorStyles.headerText}>Glucose Monitoring</Text>
       </View>
-      <View>
-        <Text>Graph</Text>
-        {/* <LineChart
-          data={graphData}
-          width={width} // from react-native
-          height={300}
-          yAxisInterval={1} // optional, defaults to 1
-          chartConfig={{
-            backgroundColor: colors.mintGreenLight,
-            backgroundGradientFrom: colors.absoluteBlack,
-            backgroundGradientTo: colors.mintGreenLight,
-            decimalPlaces: 2, // optional, defaults to 2dp
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 125, 255, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            },
-            propsForDots: {
-              r: "6",
-              strokeWidth: "2",
-              stroke: "#ffa726",
-            },
-          }}
-          bezier
-          style={{
-            marginVertical: 8,
-            borderRadius: 16,
-          }}
-        /> */}
-      </View>
-      {/* <ChartPathProvider
-        data={{
-          points: prices.map((price) => ({ x: price[0], y: [price[1]] })),
-          smoothingStrategy: "bezier",
-        }}
-      >
-        <ChartPath height={800 / 2} stroke="yellow" width={500} />
-        <ChartDot style={{ backgroundColor: "blue" }} />
-      </ChartPathProvider> */}
-      <View style={monitorStyles.addGlucoseContainer}>
+      <ScrollView>
+        <View>
+          <VictoryChart
+            maxDomain={{ y: 250 }}
+            minDomain={{ y: 50 }}
+            width={width}
+            height={width}
+          >
+            <VictoryLine
+              style={{
+                data: { stroke: colors.mintGreenDark },
+                parent: { border: "1px solid #ccc" },
+              }}
+              // animate={{
+              //   duration: 2000,
+              //   onLoad: { duration: 1000 },
+              // }}
+              x="timestamp"
+              y="glucoseMgPerDl"
+              data={glucoseRecords}
+              interpolation="natural" //step, linear, cardinal, natural
+            ></VictoryLine>
+          </VictoryChart>
+        </View>
+
+        <ButtonGroup
+          buttons={["1H", "3H", "6H", "12H", "1D", "2D"]}
+        ></ButtonGroup>
         <View style={monitorStyles.inputGlucoseUnitContainer}>
           <TextInput
             placeholder="Glucose"
             placeholderTextColor="white"
             keyboardType="numeric"
-            maxLength={3}
-            value={glucoseLevel}
-            onChangeText={(glucose) => setGlucoseLevel(glucose)}
+            maxLength={5}
+            value={glucose}
+            onChangeText={(glucose) => setGlucose(glucose)}
             style={monitorStyles.textInput}
           />
           <Dropdown
@@ -160,13 +215,13 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
               setIsFocus(false);
             }}
           />
+          <Animated.View style={springAnimatedStyle}>
+            <Pressable style={monitorStyles.button} onPress={addGlucoseLevel}>
+              <Text style={monitorStyles.buttonText}>Add</Text>
+            </Pressable>
+          </Animated.View>
         </View>
-        <Animated.View style={springAnimatedStyle}>
-          <Pressable style={monitorStyles.button} onPress={addGlucoseLevel}>
-            <Text style={monitorStyles.buttonText}>+</Text>
-          </Pressable>
-        </Animated.View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -181,9 +236,10 @@ const monitorStyles = StyleSheet.create({
     backgroundColor: colors.grey,
     justifyContent: "center",
   },
-  addGlucoseContainer: {
+  inputGlucoseUnitContainer: {
     flex: 1,
-    justifyContent: "flex-end",
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: "5%",
   },
@@ -193,9 +249,8 @@ const monitorStyles = StyleSheet.create({
     fontWeight: "500",
   },
   textInput: {
-    flex: 1,
-    height: 50,
-    // width: width / 2,
+    height: 55,
+    width: 120,
     borderWidth: 1.5,
     borderColor: colors.absoluteWhite,
     color: colors.absoluteWhite,
@@ -217,12 +272,11 @@ const monitorStyles = StyleSheet.create({
   },
   button: {
     backgroundColor: colors.grey,
-    height: 70,
-    width: 70,
+    height: 55,
+    width: 100,
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 25,
-    marginTop: 15,
     borderRadius: 35,
     borderWidth: 1.5,
     borderColor: colors.absoluteWhite,
@@ -236,23 +290,21 @@ const monitorStyles = StyleSheet.create({
     elevation: 5,
   },
   buttonText: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: "400",
     color: colors.absoluteWhite,
     letterSpacing: 0.5,
   },
   dropDownUnit: {
-    height: 50,
+    height: 55,
+    width: 100,
     backgroundColor: colors.absoluteBlack,
-    width: width / 3,
+
     borderColor: colors.mintGreenDark,
     borderWidth: 0.5,
     borderRadius: 25,
     paddingHorizontal: 8,
     marginRight: 20,
-  },
-  inputGlucoseUnitContainer: {
-    flexDirection: "row",
   },
   selectedTextStyle: {
     fontSize: 16,
@@ -265,5 +317,42 @@ const monitorStyles = StyleSheet.create({
   },
   placeholderStyle: {
     color: colors.absoluteWhite,
+  },
+  timeRangButtonsContainer: {
+    flexDirection: "row",
+    // justifyContent: "space-evenly",
+    // marginBottom: 20,
+    // borderColor: "black",
+  },
+  timeRangeButton: {
+    flex: 1,
+    height: 45,
+    width: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.mintGreenDark,
+    marginBottom: 30,
+    marginHorizontal: 6,
+  },
+  timeRangeButtonsText: {
+    color: "white",
+    fontWeight: "800",
+    fontSize: 23,
+  },
+  timeRangeButtonActive: {
+    flex: 1,
+    height: 45,
+    width: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.absoluteWhite,
+    marginHorizontal: 6,
+  },
+  timeRangeButtonsTextActive: {
+    color: colors.mintGreenDark,
+    fontWeight: "500",
+    fontSize: 18,
   },
 });

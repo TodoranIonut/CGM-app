@@ -6,6 +6,7 @@ import {
   Pressable,
   TextInput,
   Dimensions,
+  Alert,
 } from "react-native";
 
 import React, { useContext, useEffect, useState } from "react";
@@ -54,6 +55,7 @@ export default function ProfileScreen({ naviagtion }) {
       setEditMode(true);
     } else {
       setEditMode(false);
+      Alert.alert("Changes saved successfully!");
     }
   };
 
@@ -100,7 +102,7 @@ export default function ProfileScreen({ naviagtion }) {
 
   useEffect(() => {
     getProfileData();
-  }, []);
+  }, [userRole]);
 
   return (
     // <KeyboardAwareScrollView
@@ -114,34 +116,65 @@ export default function ProfileScreen({ naviagtion }) {
       </View>
       <ScrollView>
         <View style={profileStyles.userProfileContainer}>
-          {userRole === "ROLE_DOCTOR"
-            ? [
-                <View>
-                  <Text style={profileStyles.leftPatientData}>ID:</Text>
-                  <Text style={profileStyles.rightPatientData}>
-                    {thisUserId}
-                  </Text>
-                  <Text style={profileStyles.leftPatientData}>First Name:</Text>
-                  <Text style={profileStyles.rightPatientData}>
-                    {firstName}
-                  </Text>
-                  <Text style={profileStyles.leftPatientData}>Last Name:</Text>
-                  <Text style={profileStyles.rightPatientData}>{lastName}</Text>
-                  <Text style={profileStyles.leftPatientData}>Email:</Text>
-                  <Text style={profileStyles.rightPatientData}>{email}</Text>
-                  <Text style={profileStyles.leftPatientData}>Cnp:</Text>
-                  <Text style={profileStyles.rightPatientData}>{cnp}</Text>
-                  <Text style={profileStyles.leftPatientData}>
-                    Phone Number:
-                  </Text>
-                  <Text style={profileStyles.rightPatientData}>
-                    {phoneNumber}
-                  </Text>
-                  <Text style={profileStyles.leftPatientData}>Clinic:</Text>
-                  <Text style={profileStyles.rightPatientData}>{clinic}</Text>
-                </View>,
-              ]
-            : null}
+          {userRole === "ROLE_DOCTOR" ? (
+            editMode ? (
+              <View>
+                <Text style={profileStyles.leftPatientData}>ID:</Text>
+                <TextInput style={profileStyles.rightPatientData}>
+                  {thisUserId}
+                </TextInput>
+                <Text style={profileStyles.leftPatientData}>First Name:</Text>
+                <TextInput style={profileStyles.rightPatientData}>
+                  {firstName}
+                </TextInput>
+                <Text style={profileStyles.leftPatientData}>Last Name:</Text>
+                <TextInput style={profileStyles.rightPatientData}>
+                  {lastName}
+                </TextInput>
+                <Text style={profileStyles.leftPatientData}>Email:</Text>
+                <TextInput style={profileStyles.rightPatientData}>
+                  {email}
+                </TextInput>
+                <Text style={profileStyles.leftPatientData}>Cnp:</Text>
+                <Text style={profileStyles.rightPatientData}>{cnp}</Text>
+                <Text style={profileStyles.leftPatientData}>Phone Number:</Text>
+                <TextInput style={profileStyles.rightPatientData}>
+                  {phoneNumber}
+                </TextInput>
+                <Text style={profileStyles.leftPatientData}>Clinic:</Text>
+                <TextInput
+                  style={profileStyles.rightPatientData}
+                  required={editMode}
+                >
+                  {clinic}
+                </TextInput>
+              </View>
+            ) : (
+              <View>
+                <Text style={profileStyles.leftPatientData}>ID:</Text>
+                <Text style={profileStyles.rightPatientData}>{thisUserId}</Text>
+                <Text style={profileStyles.leftPatientData}>First Name:</Text>
+                <Text style={profileStyles.rightPatientData}>{firstName}</Text>
+                <Text style={profileStyles.leftPatientData}>Last Name:</Text>
+                <Text style={profileStyles.rightPatientData}>{lastName}</Text>
+                <Text style={profileStyles.leftPatientData}>Email:</Text>
+                <Text style={profileStyles.rightPatientData}>{email}</Text>
+                <Text style={profileStyles.leftPatientData}>Cnp:</Text>
+                <Text style={profileStyles.rightPatientData}>{cnp}</Text>
+                <Text style={profileStyles.leftPatientData}>Phone Number:</Text>
+                <Text style={profileStyles.rightPatientData}>
+                  {phoneNumber}
+                </Text>
+                <Text style={profileStyles.leftPatientData}>Clinic:</Text>
+                <Text
+                  style={profileStyles.rightPatientData}
+                  required={editMode}
+                >
+                  {clinic}
+                </Text>
+              </View>
+            )
+          ) : null}
           {userRole === "ROLE_PATIENT" ? (
             <View>
               <Text style={profileStyles.leftPatientData}>ID:</Text>
@@ -195,7 +228,7 @@ const profileStyles = StyleSheet.create({
   profileContainer: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: colors.greenWhite,
+    backgroundColor: colors.absoluteWhite,
   },
   headerContainer: {
     height: "8%",
@@ -210,14 +243,15 @@ const profileStyles = StyleSheet.create({
     color: "black",
   },
   headerText: {
-    color: colors.absoluteWhite,
+    color: colors.mintGreenDark,
     paddingLeft: "5%",
     fontWeight: "500",
   },
   userProfileContainer: {
     flex: 1,
     justifyContent: "flex-start",
-    backgroundColor: colors.greenWhite,
+    // backgroundColor: colors.greenWhite,
+    // backgroundColor: colors.absoluteWhite,
     // flexDirection: "row",
   },
   leftPatientData: {

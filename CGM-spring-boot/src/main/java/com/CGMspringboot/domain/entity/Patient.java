@@ -29,7 +29,7 @@ public class Patient extends AppUser {
     }
 
     public enum Diagnostic {
-        HEALTHY, DIABETES_I, DIABETES_II, GESTATIONAL
+        HEALTHY, DIABETES_I, DIABETES_II
     }
 
     @ManyToOne

@@ -30,8 +30,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     //fake login
-    // email = "crisanmihai@gmail.com";
-    email = "mirunapop@gmail.com";
+
+    //doctor
+    email = "crisanmihai@gmail.com";
+
+    //pacient
+    // email = "mirunapop@gmail.com";
     password = "123";
 
     await axios
@@ -74,7 +78,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // isLoggedIn();
+    isLoggedIn();
   }, []);
 
   return (
