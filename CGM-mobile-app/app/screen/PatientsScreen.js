@@ -28,11 +28,13 @@ import {
   BASE_URL,
   GET_PATIENTS_BY_DOCTOR_EMAIL,
   POST_GLUCOSE_COMPUTE,
+  DELETE_PATIENT_BY_ID,
 } from "../config/config";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScrollView } from "react-native-gesture-handler";
 import { SearchBar } from "react-native-screens";
+import MonitorForDoctor from "./MonitorForDoctor";
 
 const { width, height } = Dimensions.get("window");
 
@@ -45,10 +47,13 @@ export default function PatientsScreen({ navigation }) {
   const [selectedPatientId, setSelectedPatientId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [estimateDays, setEstimateDays] = useState(0);
-  const [predictedDiagnostic, setPredictedDiagnostic] = useState();
+  const [predictedDiagnostic, setPredictedDiagnostic] = useState(null);
   // patients.map((data) => {
   //   return;
   // });
+  const authorizationConfig = {
+    headers: { Authorization: `Bearer ${userToken}` },
+  };
 
   const springAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -58,7 +63,10 @@ export default function PatientsScreen({ navigation }) {
 
   const getPatients = () => {
     axios
-      .get(`${BASE_URL}${GET_PATIENTS_BY_DOCTOR_EMAIL}${userName}`)
+      .get(
+        `${BASE_URL}${GET_PATIENTS_BY_DOCTOR_EMAIL}${userName}`,
+        authorizationConfig
+      )
       .then((res) => {
         // console.log(res.data);
         console.log(res.data[1]);
@@ -72,12 +80,18 @@ export default function PatientsScreen({ navigation }) {
   };
 
   const predictDiacnostic = async (emailPatient) => {
-    console.log("start traning");
+    console.log("days estimate", estimateDays);
+    console.log("email patient", emailPatient);
+
     await axios
-      .post(`${BASE_URL}${POST_GLUCOSE_COMPUTE}`, {
-        patientEmail: emailPatient,
-        days: estimateDays,
-      })
+      .post(
+        `${BASE_URL}${POST_GLUCOSE_COMPUTE}`,
+        {
+          patientEmail: emailPatient,
+          days: estimateDays,
+        },
+        authorizationConfig
+      )
       .then((res) => {
         console.log(res.data);
         setPredictedDiagnostic(res.data);
@@ -85,6 +99,26 @@ export default function PatientsScreen({ navigation }) {
       .catch((e) => {
         console.log(`Login error ${e}`);
       });
+  };
+
+  const deletePatient = async (patientId) => {
+    console.log("try to delete ", patientId);
+
+    await axios
+      .delete(
+        `${BASE_URL}${DELETE_PATIENT_BY_ID}${patientId}`,
+        authorizationConfig
+      )
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((e) => {
+        console.log(`Login error ${e}`);
+      });
+  };
+  const showIstoric = async (patientEmail) => {
+    navigation.navigate("DoctorMonitor");
+    MonitorForDoctor(navigation, patientEmail);
   };
 
   const statusStyles = {
@@ -149,24 +183,26 @@ export default function PatientsScreen({ navigation }) {
                       <Text style={patientsStyle.leftPatientData}>
                         Weight:
                       </Text>,
+                      <Pressable
+                        style={patientsStyle.trainButton}
+                        onPress={() => {
+                          showIstoric(item.email);
+                        }}
+                      >
+                        <Text style={patientsStyle.trainButtonText}>
+                          Show Istoric
+                        </Text>
+                      </Pressable>,
                       item.diagnostic === "HEALTHY" ||
                       item.diagnostic === "DIABETES_II"
                         ? [
-                            <Pressable
-                              style={patientsStyle.trainButton}
-                              onPress={predictDiacnostic(item.email)}
-                            >
-                              <Text style={patientsStyle.trainButtonText}>
-                                Show Istoric
-                              </Text>
-                            </Pressable>,
                             <View style={patientsStyle.trainButton}>
                               <TextInput
                                 placeholder="Number of Days"
                                 placeholderTextColor="white"
                                 keyboardType="numeric"
                                 maxLength={3}
-                                value={estimateDays}
+                                // value={estimateDays}
                                 onChangeText={(estimateDays) =>
                                   setEstimateDays(estimateDays)
                                 }
@@ -224,20 +260,24 @@ export default function PatientsScreen({ navigation }) {
                       <Text style={patientsStyle.rightPatientData}>
                         {item.weightKg} kg
                       </Text>,
+                      <Pressable
+                        style={patientsStyle.trainButton}
+                        onPress={() => {
+                          deletePatient(item.patientId);
+                        }}
+                      >
+                        <Text style={patientsStyle.trainButtonText}>
+                          Delete
+                        </Text>
+                      </Pressable>,
                       item.diagnostic === "HEALTHY" ||
                       item.diagnostic === "DIABETES_II"
                         ? [
                             <Pressable
                               style={patientsStyle.trainButton}
-                              onPress={predictDiacnostic(item.email)}
-                            >
-                              <Text style={patientsStyle.trainButtonText}>
-                                Delete
-                              </Text>
-                            </Pressable>,
-                            <Pressable
-                              style={patientsStyle.trainButton}
-                              onPress={predictDiacnostic(item.email)}
+                              onPress={() => {
+                                predictDiacnostic(item.email);
+                              }}
                             >
                               <Text
                                 style={[
@@ -256,8 +296,11 @@ export default function PatientsScreen({ navigation }) {
                                 { color: colors.babyBlue },
                               ]}
                             >
-                              {/* {predictedDiagnostic} */}
-                              HIPERGLICEMIA
+                              {predictedDiagnostic === null ? (
+                                <Text>No Computed Data</Text>
+                              ) : (
+                                <Text>{predictedDiagnostic}</Text>
+                              )}
                             </Text>,
                           ]
                         : null,
@@ -302,6 +345,9 @@ export default function PatientsScreen({ navigation }) {
       <View style={patientsStyle.addGlucoseContainer}>
         <View style={patientsStyle.inputGlucoseUnitContainer}></View>
         <Animated.View style={springAnimatedStyle}>
+          <Pressable style={patientsStyle.button} onPress={getPatients}>
+            <Text style={patientsStyle.buttonText}>Refresh</Text>
+          </Pressable>
           <Pressable
             style={patientsStyle.button}
             onPress={() => navigation.navigate("AddPatients")}

@@ -33,7 +33,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { Alert } from "react-native";
 const { width, height } = Dimensions.get("window");
 
-export default function GlucoseMonitorScreen({ naviagtion }) {
+export default function MonitorForDoctor({ naviagtion, patientEmail }) {
   const { login, logout, isLoggedIn, userToken, userName, userRole } =
     useContext(AuthContext);
   const animatedScaleValue = useSharedValue(1);
@@ -155,6 +155,7 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
               >
                 {buttonLabel}
               </Text>
+              <Text>{patientEmail}</Text>
             </TouchableOpacity>
           );
         })}
@@ -199,38 +200,6 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
         <ButtonGroup
           buttons={["1H", "3H", "6H", "12H", "1D", "2D"]}
         ></ButtonGroup>
-        <View style={monitorStyles.inputGlucoseUnitContainer}>
-          <TextInput
-            placeholder="Glucose"
-            placeholderTextColor="white"
-            keyboardType="numeric"
-            maxLength={5}
-            value={glucose}
-            onChangeText={(glucose) => setGlucose(glucose)}
-            style={monitorStyles.textInput}
-          />
-          <Dropdown
-            style={monitorStyles.dropDownUnit}
-            data={items}
-            placeholder={"Mg/dL"}
-            selectedTextStyle={monitorStyles.selectedTextStyle}
-            inputSearchStyle={monitorStyles.inputSearchStyle}
-            placeholderStyle={monitorStyles.placeholderStyle}
-            labelField="label"
-            valueField="value"
-            onBlur={() => setIsFocus(false)}
-            onFocus={() => setIsFocus(true)}
-            onChange={(item) => {
-              setValue(item.value);
-              setIsFocus(false);
-            }}
-          />
-          <Animated.View style={springAnimatedStyle}>
-            <Pressable style={monitorStyles.button} onPress={addGlucoseLevel}>
-              <Text style={monitorStyles.buttonText}>Add</Text>
-            </Pressable>
-          </Animated.View>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );

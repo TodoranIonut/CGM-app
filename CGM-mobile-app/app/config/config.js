@@ -15,3 +15,8 @@ export const POST_PATIENT_GLUCOSE_START_TIMESTAMP = "/api/glucose/byTimestamp";
 export const POST_GLUCOSE_SAVE = "/api/glucose/save";
 
 export const POST_GLUCOSE_COMPUTE = "/api/glucose/compute";
+
+export const PUT_UPDATE_DOCTOR = "/api/doctor/update/id/";
+export const PUT_UPDATE_PATIENT = "/api/patient/update/id/";
+
+export const DELETE_PATIENT_BY_ID = "/api/patient/delete/id/";

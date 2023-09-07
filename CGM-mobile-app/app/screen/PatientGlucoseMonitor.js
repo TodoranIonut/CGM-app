@@ -33,7 +33,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { Alert } from "react-native";
 const { width, height } = Dimensions.get("window");
 
-export default function GlucoseMonitorScreen({ naviagtion }) {
+export default function GlucoseMonitorScreen({ naviagtion, patientEmail }) {
   const { login, logout, isLoggedIn, userToken, userName, userRole } =
     useContext(AuthContext);
   const animatedScaleValue = useSharedValue(1);
@@ -51,6 +51,7 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
   const authorizationConfig = {
     headers: { Authorization: `Bearer ${userToken}` },
   };
+
   const springAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: animatedScaleValue.value }],

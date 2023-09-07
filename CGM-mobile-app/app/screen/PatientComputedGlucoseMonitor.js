@@ -74,14 +74,10 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
       );
     } else {
       await axios
-        .post(
-          `${BASE_URL}${POST_GLUCOSE_SAVE}`,
-          {
-            patientEmail: userName,
-            glucoseMgPerDl: glucose,
-          },
-          authorizationConfig
-        )
+        .post(`${BASE_URL}${POST_GLUCOSE_SAVE}`, {
+          patientEmail: userName,
+          glucoseMgPerDl: glucose,
+        })
         .then((res) => {})
         .catch((e) => {
           console.log(`Add glucose error ${e}`);

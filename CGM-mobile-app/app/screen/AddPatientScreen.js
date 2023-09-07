@@ -26,6 +26,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import axios from "axios";
 import { BASE_URL, REGISTER_PATH } from "../config/config";
 import { Dropdown } from "react-native-element-dropdown";
+import { getPatients } from "../screen/PatientsScreen";
 
 const { width, height } = Dimensions.get("window");
 
@@ -46,11 +47,12 @@ export default function AddPatientScreen({ navigation }) {
   const [weightKg, setWeightKg] = useState("");
   const [doctorId, setDoctorId] = useState(1);
   const [isFocus, setIsFocus] = useState(false);
-  const [value, setValue] = useState(null);
+  const [genderValue, setGenderValue] = useState(null);
+  const [diagnosticValue, setDiagnosticValue] = useState(null);
   const [diagnostic, setDiagnostic] = useState([
     { label: "HEALTHY", value: "HEALTHY" },
-    { label: "DIABETE_I", value: "DIABETE_I" },
-    { label: "DIABETE_II", value: "DIABETE_II" },
+    { label: "DIABETES_I", value: "DIABETES_I" },
+    { label: "DIABETES_II", value: "DIABETES_II" },
   ]);
 
   const validateUserPatientData = () => {
@@ -86,21 +88,30 @@ export default function AddPatientScreen({ navigation }) {
     const makePost = validateUserPatientData();
 
     if (makePost == true) {
+      const authorizationConfig = {
+        headers: { Authorization: `Bearer ${userToken}` },
+      };
+
+      const dataUpdate = {
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phoneNumber,
+        gender: genderValue,
+        email: email,
+        cnp: cnp,
+        age: age,
+        heightCm: heightCm,
+        weightKg: weightKg,
+        diagnostic: diagnosticValue,
+        doctorEmail: userName,
+      };
+
+      console.log(dataUpdate);
+
       await axios
-        .post(`${BASE_URL}${REGISTER_PATH}`, {
-          firstName: firstName,
-          lastName: lastName,
-          phoneNumber: phoneNumber,
-          gender: gender,
-          email: email,
-          cnp: cnp,
-          age: age,
-          heightCm: heightCm,
-          weightKg: weightKg,
-          doctorId: 1,
-        })
+        .post(`${BASE_URL}${REGISTER_PATH}`, dataUpdate, authorizationConfig)
         .then((res) => {
-          console.log(res.data["email"]);
+          console.log(res.data);
           navigation.navigate("Patients");
           Alert.alert("Success!!!", "Patient was added succesfully!");
         })
@@ -111,6 +122,8 @@ export default function AddPatientScreen({ navigation }) {
           );
           console.log(`Login error ${e}`);
         });
+
+      getPatients();
     }
   };
 
@@ -144,14 +157,12 @@ export default function AddPatientScreen({ navigation }) {
             <TextInput
               placeholder="First Name"
               placeholderTextColor="white"
-              value={firstName}
               onChangeText={(firstName) => setFirstName(firstName)}
               style={styles.textInput}
             />
             <TextInput
               placeholder="Last Name"
               placeholderTextColor="white"
-              value={lastName}
               onChangeText={(lastName) => setLastName(lastName)}
               style={styles.textInput}
             />
@@ -182,49 +193,43 @@ export default function AddPatientScreen({ navigation }) {
               onBlur={() => setIsFocus(true)}
               onFocus={() => setIsFocus(false)}
               onChange={(gender) => {
-                setValue(gender.value);
+                setGenderValue(gender.value);
                 setIsFocus(false);
               }}
             />
             <TextInput
               placeholder="Email"
               placeholderTextColor="white"
-              value={email}
               onChangeText={(email) => setEmail(email)}
               style={styles.textInput}
             />
             <TextInput
               placeholder="CNP"
               placeholderTextColor="white"
-              value={cnp}
               onChangeText={(cnp) => setCnp(cnp)}
               style={styles.textInput}
             />
             <TextInput
               placeholder="Phone Number"
               placeholderTextColor="white"
-              value={phoneNumber}
               onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
               style={styles.textInput}
             />
             <TextInput
               placeholder="Age"
               placeholderTextColor="white"
-              value={age}
               onChangeText={(age) => setAge(age)}
               style={styles.textInput}
             />
             <TextInput
               placeholder="Height (CM)"
               placeholderTextColor="white"
-              value={heightCm}
               onChangeText={(heightCm) => setHeightCm(heightCm)}
               style={styles.textInput}
             />
             <TextInput
               placeholder="Weight (KG)"
               placeholderTextColor="white"
-              value={weightKg}
               onChangeText={(weightKg) => setWeightKg(weightKg)}
               style={styles.textInput}
             />
@@ -255,7 +260,7 @@ export default function AddPatientScreen({ navigation }) {
               onBlur={() => setIsFocus(true)}
               onFocus={() => setIsFocus(false)}
               onChange={(diagnostic) => {
-                setValue(diagnostic.value);
+                setDiagnosticValue(diagnostic.value);
                 setIsFocus(false);
               }}
             />

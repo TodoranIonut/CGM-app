@@ -1,0 +1,48 @@
+// import { LineChart, ContributionGraph } from "react-native-chart-kit";
+// import { LineGraph } from "react-native-graph";
+// import { LineChart } from "react-native-wagmi-charts";
+// import {
+//   ChartDot,
+//   ChartPath,
+//   ChartPathProvider,
+//   monotoneCubicInterpolation,
+// } from "@rainbow-me/animated-charts";
+
+{
+  /* <ChartPathProvider
+          data={{
+            points: prices.map((price) => ({ x: price[0], y: [price[1]] })),
+            smoothingStrategy: "bezier",
+          }}
+        >
+          <ChartPath height={width / 2} stroke="green" width={width} />
+          <ChartDot style={{ backgroundColor: "black" }} />
+        </ChartPathProvider> */
+}
+{
+  /* <LineChart
+          values={commitsData}
+          endDate={new Date("2017-04-01")}
+          numDays={105}
+          width={width}
+          height={220}
+          chartConfig={chartConfig}
+        /> */
+}
+{
+  /* <LineGraph
+          points={data}
+          animated={true}
+          selectionDotShadowColor="#333333"
+        /> */
+}
+{
+  /* <LineChart.Provider data={glucoseData}>
+          <LineChart>
+            <LineChart.Path />
+            <LineChart.CursorCrosshair>
+              <LineChart.Tooltip />
+            </LineChart.CursorCrosshair>
+          </LineChart>
+        </LineChart.Provider> */
+}

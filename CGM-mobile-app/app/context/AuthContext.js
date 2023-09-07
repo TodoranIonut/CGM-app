@@ -32,11 +32,11 @@ export const AuthProvider = ({ children }) => {
     //fake login
 
     //doctor
-    email = "crisanmihai@gmail.com";
+    // email = "crisanmihai@gmail.com";
 
     //pacient
     // email = "mirunapop@gmail.com";
-    password = "123";
+    // password = "123";
 
     await axios
       .post(`${BASE_URL}${LOGIN_PATH}`, {
@@ -52,6 +52,8 @@ export const AuthProvider = ({ children }) => {
 
         var sub = decoded["sub"];
         var rol = decoded["authorities"][0]["authority"];
+        console.log(sub);
+        console.log(rol);
         setUserName(sub);
         setUserRole(rol);
       })

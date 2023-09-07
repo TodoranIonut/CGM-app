@@ -15,13 +15,14 @@ import ProfileScreen from "../screen/ProfileScreen";
 import PatientsScreen from "../screen/PatientsScreen";
 import colors from "../config/colors";
 import AddPatientScreen from "../screen/AddPatientScreen";
+import MonitorForDoctor from "../screen/MonitorForDoctor";
 
 //screen names
 const glucoseMonitorName = "Monitor";
 const patientsName = "Patients";
 const addPatientsName = "AddPatients";
 const profileName = "Profile";
-
+const monitorForDoctor = "DoctorMonitor";
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -40,51 +41,65 @@ const PatientsStackNavigator = () => (
       name={addPatientsName}
       component={AddPatientScreen}
     ></PatientsStack.Screen>
+    <PatientsStack.Screen
+      options={{ headerShown: false }}
+      name={monitorForDoctor}
+      component={MonitorForDoctor}
+    ></PatientsStack.Screen>
   </PatientsStack.Navigator>
 );
 
-const BottomTabNavigator = () => (
-  <Tab.Navigator
-    initialRouteName={profileName}
-    screenOptions={({ route }) => ({
-      tabBarIcon: ({ focused, color, size }) => {
-        let iconName;
-        let rn = route.name;
+const BottomTabNavigator = () => {
+  const { login, logout, isLoading, userToken, userName, userRole } =
+    useContext(AuthContext);
 
-        if (rn === glucoseMonitorName) {
-          iconName = focused ? "analytics" : "analytics-outline";
-        } else if (rn === patientsName) {
-          iconName = focused ? "people" : "people-outline";
-        } else if (rn === profileName) {
-          iconName = focused ? "person-circle" : "person-circle-outline";
-        }
+  return (
+    <Tab.Navigator
+      initialRouteName={profileName}
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          let rn = route.name;
 
-        return <Ionicons name={iconName} size={size} color={color} />;
-      },
-      tabBarActiveTintColor: colors.mintGreenDark,
-      tabBarInactiveTintColor: "grey",
-      tabBarLabelStyle: { paddingBottom: 10, fontSize: 13 },
-      tabBarIconStyle: { paddingTop: -5, height: 25 },
-      tabBarStyle: { height: 75 },
-      headerShown: false,
-    })}
-  >
-    {role === "ROLE_DOCTOR" ? (
-      <Tab.Screen name={patientsName} component={PatientsStackNavigator} />
-    ) : (
-      <Tab.Screen name={glucoseMonitorName} component={GlucoseMonitorScreen} />
-    )}
-    <Tab.Screen name={profileName} component={ProfileScreen} />
-  </Tab.Navigator>
-);
+          if (rn === glucoseMonitorName) {
+            iconName = focused ? "analytics" : "analytics-outline";
+          } else if (rn === patientsName) {
+            iconName = focused ? "people" : "people-outline";
+          } else if (rn === profileName) {
+            iconName = focused ? "person-circle" : "person-circle-outline";
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: colors.mintGreenDark,
+        tabBarInactiveTintColor: "grey",
+        tabBarLabelStyle: { paddingBottom: 10, fontSize: 13 },
+        tabBarIconStyle: { paddingTop: -5, height: 25 },
+        tabBarStyle: { height: 75 },
+        headerShown: false,
+      })}
+    >
+      {userRole === "ROLE_DOCTOR" ? (
+        <Tab.Screen name={patientsName} component={PatientsStackNavigator} />
+      ) : null}
+      {userRole === "ROLE_PATIENT" ? (
+        <Tab.Screen
+          name={glucoseMonitorName}
+          component={GlucoseMonitorScreen}
+        />
+      ) : null}
+      <Tab.Screen name={profileName} component={ProfileScreen} />
+    </Tab.Navigator>
+  );
+};
 
 export function AppNav() {
-  useEffect(() => {
-    role = userRole;
-  }, [role]);
+  // useEffect(() => {
+  // }, []);
 
   const { login, logout, isLoading, userToken, userName, userRole } =
     useContext(AuthContext);
+
   if (isLoading) {
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <ActivityIndicator size="large" />
