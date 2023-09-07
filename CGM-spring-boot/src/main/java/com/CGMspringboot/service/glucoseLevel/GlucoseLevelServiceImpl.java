@@ -1,11 +1,14 @@
 package com.CGMspringboot.service.glucoseLevel;
 
+import com.CGMspringboot.domain.ai.GlucoseLevelNewMeasure;
 import com.CGMspringboot.domain.entity.GlucoseLevel;
 import com.CGMspringboot.domain.entity.Patient;
 import com.CGMspringboot.domain.repository.GlucoseLevelRepository;
 import com.CGMspringboot.domain.repository.PatientRepository;
 import com.CGMspringboot.exceptions.appUser.UserEmailNotFoundException;
 import com.CGMspringboot.exceptions.appUser.UserIdNotFoundException;
+import com.CGMspringboot.service.aiService.ComputingService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,9 +24,10 @@ public class GlucoseLevelServiceImpl implements GlucoseLevelService {
 
     private final GlucoseLevelRepository glucoseLevelRepository;
     private final PatientRepository patientRepository;
+    private final ComputingService computingService;
 
     @Override
-    public GlucoseLevel saveGlucoseLevel(GlucoseLevel glucoseLevel) throws UserEmailNotFoundException {
+    public GlucoseLevel saveGlucoseLevel(GlucoseLevel glucoseLevel) throws UserEmailNotFoundException, JsonProcessingException {
 //        Integer patientId = glucoseLevel.getPatient().getId();
         String patientEmail = glucoseLevel.getPatient().getEmail();
         Patient patient = patientRepository.findByEmail(patientEmail).orElseThrow(
@@ -33,6 +37,13 @@ public class GlucoseLevelServiceImpl implements GlucoseLevelService {
         if (glucoseLevel.getTimestamp() == 0) {
             glucoseLevel.setTimestamp(System.currentTimeMillis()/1000);
         }
+        GlucoseLevelNewMeasure computeGlucoseLevel = new GlucoseLevelNewMeasure();
+        computeGlucoseLevel.setPatientId(patient.getId());
+        computeGlucoseLevel.setGlucoseMgPerDl(glucoseLevel.getGlucoseMgPerDl());
+        computeGlucoseLevel.setTimestamp(glucoseLevel.getTimestamp());
+
+        computingService.addGlucoseMeasureToDataset(computeGlucoseLevel);
+
         return glucoseLevelRepository.save(glucoseLevel);
     }
 

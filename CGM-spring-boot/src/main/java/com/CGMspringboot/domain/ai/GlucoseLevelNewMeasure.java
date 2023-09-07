@@ -8,6 +8,6 @@ import lombok.Setter;
 public class GlucoseLevelNewMeasure {
 
     private int patientId;
-    private int timestamp;
+    private long timestamp;
     private float glucoseMgPerDl;
 }

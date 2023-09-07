@@ -12,6 +12,7 @@ import com.CGMspringboot.exceptions.appUser.UserIdNotFoundException;
 import com.CGMspringboot.exceptions.date.InvalidDateFormatException;
 import com.CGMspringboot.service.aiService.ComputingService;
 import com.CGMspringboot.service.glucoseLevel.GlucoseLevelService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class GlucoseLevelController {
 
     @PostMapping("/save")
 //    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
-    public ResponseEntity<GlucoseLevelResponseDTO> saveGlucoseLevel(@RequestBody GlucoseLevelRequestDTO glucoseLevelRequestDTO) throws UserEmailNotFoundException {
+    public ResponseEntity<GlucoseLevelResponseDTO> saveGlucoseLevel(@RequestBody GlucoseLevelRequestDTO glucoseLevelRequestDTO) throws UserEmailNotFoundException, JsonProcessingException {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/glucose/save").toUriString());
         GlucoseLevel glucoseLevel = glucoseLevelMapper.toGlucoseLevel(glucoseLevelRequestDTO);
         GlucoseLevel savedGlucoseLevel = glucoseLevelService.saveGlucoseLevel(glucoseLevel);

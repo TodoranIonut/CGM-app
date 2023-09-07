@@ -56,5 +56,5 @@ def estimate_glicemia_api(patientId: str):
 def estimate_high_glicemia_api(patientId: str, untilTimestamp: int):
     # untilDateTime = datetime.datetime(2023, 6, 20, 15, 45, 15)
     # untilTimestamp = int(untilTimestamp)
-    return estimate_glucose_level_until_specific_data(patientId, untilTimestamp, False)
-    # return estimate_glucose_level_until_specific_data(patientId, untilTimestamp, True, 1000)
+    # return estimate_glucose_level_until_specific_data(patientId, untilTimestamp, False)
+    return estimate_glucose_level_until_specific_data(patientId, untilTimestamp, True, 600)

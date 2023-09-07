@@ -105,7 +105,7 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
         authorizationConfig
       )
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         setGlucoseRecords(res.data);
       })
       .catch((e) => {
@@ -184,10 +184,10 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
                 data: { stroke: colors.mintGreenDark },
                 parent: { border: "1px solid #ccc" },
               }}
-              // animate={{
-              //   duration: 2000,
-              //   onLoad: { duration: 1000 },
-              // }}
+              animate={{
+                duration: 2000,
+                onLoad: { duration: 1000 },
+              }}
               x="timestamp"
               y="glucoseMgPerDl"
               data={glucoseRecords}
@@ -205,7 +205,7 @@ export default function GlucoseMonitorScreen({ naviagtion }) {
             placeholderTextColor="white"
             keyboardType="numeric"
             maxLength={5}
-            value={glucose}
+            // value={glucose}
             onChangeText={(glucose) => setGlucose(glucose)}
             style={monitorStyles.textInput}
           />

@@ -62,6 +62,7 @@ export default function PatientsScreen({ navigation }) {
   });
 
   const getPatients = () => {
+    setPredictedDiagnostic(null);
     axios
       .get(
         `${BASE_URL}${GET_PATIENTS_BY_DOCTOR_EMAIL}${userName}`,
@@ -82,7 +83,6 @@ export default function PatientsScreen({ navigation }) {
   const predictDiacnostic = async (emailPatient) => {
     console.log("days estimate", estimateDays);
     console.log("email patient", emailPatient);
-
     await axios
       .post(
         `${BASE_URL}${POST_GLUCOSE_COMPUTE}`,
@@ -149,12 +149,6 @@ export default function PatientsScreen({ navigation }) {
         }
       })
       .map((item) => {
-        const AiButton = () => {
-          {
-            item.diagnostic === "HEALTHY" ? <Text>Asdasd</Text> : null;
-          }
-        };
-
         return (
           <Pressable onPress={() => viewPatientData(item.patientId)}>
             <View style={patientsStyle.patientDataContainer}>
