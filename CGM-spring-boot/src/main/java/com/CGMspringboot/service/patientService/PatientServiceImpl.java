@@ -12,6 +12,7 @@ import com.CGMspringboot.exceptions.appUser.UserEmailConflictException;
 import com.CGMspringboot.exceptions.appUser.UserEmailNotFoundException;
 import com.CGMspringboot.exceptions.appUser.UserIdNotFoundException;
 import com.CGMspringboot.exceptions.appUser.UserPhoneNumberConflictException;
+import com.CGMspringboot.service.doctorService.DoctorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,7 @@ public class PatientServiceImpl implements PatientService{
     private final DoctorRepository doctorRepository;
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DoctorService doctorService;
 
     @Override
     public Patient findPatientById(Integer patientId) throws UserIdNotFoundException {
@@ -52,6 +54,8 @@ public class PatientServiceImpl implements PatientService{
     public Patient registerNewPatient(Patient patient) throws CGMApplicationException {
         checkPatientEmailIsAvailable(patient.getEmail());
         checkPatientPhoneNumberIsAvailable(patient.getPhoneNumber());
+        Doctor doctor = doctorService.findDoctorByEmail(patient.getDoctor().getEmail());
+        patient.setDoctor(doctor);
         patient.setPassword(passwordEncoder.encode(patient.getCnp()));
         patient.setRole(Role.PATIENT);
         log.info("save user {}", patient.getEmail());
@@ -72,7 +76,6 @@ public class PatientServiceImpl implements PatientService{
         findPatient.setEmail(patient.getEmail());
         findPatient.setCnp(patient.getCnp());
         findPatient.setGender(patient.getGender());
-        findPatient.setPassword(patient.getPassword());
         findPatient.setPhoneNumber(patient.getPhoneNumber());
         findPatient.setAge(patient.getAge());
         findPatient.setWeightKg(patient.getWeightKg());

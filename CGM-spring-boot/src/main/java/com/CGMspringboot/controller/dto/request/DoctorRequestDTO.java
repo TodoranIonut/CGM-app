@@ -11,7 +11,6 @@ public class DoctorRequestDTO {
     private String lastName;
     private String phoneNumber;
     private String email;
-    private String password;
     private String cnp;
     private String clinic;
 }

@@ -11,6 +11,7 @@ import com.CGMspringboot.exceptions.appUser.UserIdNotFoundException;
 import com.CGMspringboot.exceptions.appUser.UserPhoneNumberConflictException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +21,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Doctor findDoctorById(Integer doctorId) throws UserIdNotFoundException {
@@ -43,6 +45,7 @@ public class DoctorServiceImpl implements DoctorService {
     public Doctor registerNewDoctor(Doctor doctor) throws CGMApplicationException {
         checkDoctorEmailIsAvailable(doctor.getEmail());
         checkDoctorPhoneNumberIsAvailable(doctor.getPhoneNumber());
+        doctor.setPassword(passwordEncoder.encode(doctor.getCnp()));
         doctor.setRole(Role.DOCTOR);
         log.info("save user {}", doctor.getEmail());
         return doctorRepository.save(doctor);
@@ -61,7 +64,6 @@ public class DoctorServiceImpl implements DoctorService {
         findDoctor.setLastName(doctor.getLastName());
         findDoctor.setCnp(doctor.getCnp());
         findDoctor.setEmail(doctor.getEmail());
-        findDoctor.setPassword(doctor.getPassword());
         findDoctor.setPhoneNumber(doctor.getPhoneNumber());
         findDoctor.setClinic(doctor.getClinic());
         doctorRepository.save(findDoctor);

@@ -10,6 +10,7 @@ import com.CGMspringboot.exceptions.appUser.UserIdNotFoundException;
 import com.CGMspringboot.service.patientService.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,7 +26,7 @@ public class PatientController {
     private final PatientMapper patientMapper;
 
     @GetMapping("/id/{id}")
-//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
     public ResponseEntity<PatientResponseDTO> getPatientById(@PathVariable Integer id) throws UserIdNotFoundException {
         Patient patient = patientService.findPatientById(id);
         PatientResponseDTO patientResponseDTO = patientMapper.toPatientResponseDTO(patient);
@@ -33,7 +34,7 @@ public class PatientController {
     }
 
     @GetMapping("/byEmail/{email}")
-//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
     public ResponseEntity<PatientResponseDTO> getPatientByEmail(@PathVariable String email) throws UserEmailNotFoundException {
         Patient patient = patientService.findPatientByEmail(email);
         PatientResponseDTO patientResponseDTO = patientMapper.toPatientResponseDTO(patient);
@@ -41,7 +42,7 @@ public class PatientController {
     }
 
     @PostMapping("/register")
-//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<PatientResponseDTO> registerPatient(@RequestBody PatientRequestDTO patientRequestDTO) throws CGMApplicationException {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/patient/register").toUriString());
         Patient patient = patientMapper.toPatient(patientRequestDTO);
@@ -51,7 +52,7 @@ public class PatientController {
     }
 
     @PutMapping("/update/id/{id}")
-//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
     public ResponseEntity<PatientResponseDTO> updatePatient(@PathVariable Integer id, @RequestBody PatientRequestDTO patientRequestDTO) throws CGMApplicationException {
         Patient patient = patientMapper.toPatient(patientRequestDTO);
         Patient updatedPatient = patientService.updatePatient(id, patient);
@@ -60,14 +61,14 @@ public class PatientController {
     }
 
     @DeleteMapping("/delete/id/{id}")
-//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<String> deletePatientById(@PathVariable Integer id) {
         patientService.deletePatientById(id);
         return ResponseEntity.ok().body("delete user id " + id);
     }
 
     @GetMapping("/byDoctor/id/{id}")
-//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<List<PatientResponseDTO>> getPatientsByDoctorId(@PathVariable Integer id) throws UserIdNotFoundException {
         List<Patient> patientList = patientService.findPatientsByDoctor(id);
         List<PatientResponseDTO> patientResponseDTOList = patientMapper.toPatientResponseDTOList(patientList);
@@ -75,7 +76,7 @@ public class PatientController {
     }
 
     @GetMapping("/byDoctorEmail/{email}")
-//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<List<PatientResponseDTO>> getPatientsByDoctorEmail(@PathVariable String email) throws UserIdNotFoundException, UserEmailNotFoundException {
         List<Patient> patientList = patientService.findPatientsByDoctorEmail(email);
         List<PatientResponseDTO> patientResponseDTOList = patientMapper.toPatientResponseDTOList(patientList);

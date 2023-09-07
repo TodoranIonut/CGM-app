@@ -17,5 +17,5 @@ public class PatientRequestDTO {
     private float heightCm;
     private float weightKg;
     private String diagnostic;
-    private Integer doctorId;
+    private String doctorEmail;
 }

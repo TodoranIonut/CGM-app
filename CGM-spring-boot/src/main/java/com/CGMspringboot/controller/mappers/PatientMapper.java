@@ -56,7 +56,7 @@ public class PatientMapper {
         patient.setDiagnostic(Patient.Diagnostic.valueOf(patientRequestDTO.getDiagnostic()));
 
         Doctor doctor = new Doctor();
-        doctor.setId(patientRequestDTO.getDoctorId());
+        doctor.setEmail(patientRequestDTO.getDoctorEmail());
         patient.setDoctor(doctor);
 
         return patient;

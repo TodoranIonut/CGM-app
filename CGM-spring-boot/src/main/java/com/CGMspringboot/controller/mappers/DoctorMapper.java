@@ -39,7 +39,6 @@ public class DoctorMapper {
         doctor.setPhoneNumber(doctorRequestDTO.getPhoneNumber());
         doctor.setEmail(doctorRequestDTO.getEmail());
         doctor.setCnp(doctorRequestDTO.getCnp());
-        doctor.setPassword(doctorRequestDTO.getPassword());
         doctor.setClinic(doctorRequestDTO.getClinic());
 
         return doctor;
